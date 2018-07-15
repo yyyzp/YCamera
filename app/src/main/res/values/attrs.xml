@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="WatchView">
+        <attr name="watchViewState" format="boolean" />
+        <attr name="watchViewImgResNormal" format="reference" />
+        <attr name="watchViewImgResPress" format="reference" />
+        <attr name="watchViewTextNormal" format="reference|string" />
+        <attr name="watchViewTextPress" format="reference|string" />
+        <attr name="watchViewBgNormal" format="reference" />
+        <attr name="watchViewBgPress" format="reference" />
+        <attr name="watchViewSpacing" format="dimension" />
+
+    </declare-styleable>
+
+
+</resources>

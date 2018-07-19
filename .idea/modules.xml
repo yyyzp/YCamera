@@ -2,8 +2,9 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/YCamera.iml" filepath="$PROJECT_DIR$/.idea/YCamera.iml" />
+      <module fileurl="file://E:\studioPro\opengltest\.idea\YCamera.iml" filepath="E:\studioPro\opengltest\.idea\YCamera.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/opengltest.iml" filepath="$PROJECT_DIR$/opengltest.iml" />
       <module fileurl="file://D:\Android Studio\android-studio-ide-171.4408382-windows\programme\YCamera\opengltest.iml" filepath="D:\Android Studio\android-studio-ide-171.4408382-windows\programme\YCamera\opengltest.iml" />
     </modules>
   </component>

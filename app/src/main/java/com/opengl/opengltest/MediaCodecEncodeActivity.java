@@ -52,8 +52,8 @@ public class MediaCodecEncodeActivity extends Activity implements View.OnClickLi
 //        yVideoEncoder = new YVideoEncoder();
 //        yVideoEncoder.configure();
 //        yVideoEncoder.start();
-        width = 1080;
-        height = 1920;
+        width = 1280;
+        height = 720;
         frameRate = 30;
         bitRate = 1024 * 1024 * 5;
         avcEncoder = new AvcEncoder(YUVQueue, width, height, frameRate, bitRate);

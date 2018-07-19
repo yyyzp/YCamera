@@ -6,6 +6,7 @@ import android.media.MediaFormat;
 import android.os.Environment;
 
 import com.opengl.opengltest.MainActivity;
+import com.opengl.opengltest.muxer.YMeidiaMuxer;
 
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -20,30 +21,31 @@ import static android.media.MediaCodec.BUFFER_FLAG_KEY_FRAME;
 /**
  * Created by zhipengyang on 2018/7/19.
  */
-public class AvcEncoder
-{
+public class AvcEncoder {
     private final static String TAG = "MeidaCodec";
 
     private int TIMEOUT_USEC = 12000;
 
     private MediaCodec mediaCodec;
+    private MediaFormat mediaFormat;
+    private YMeidiaMuxer yMeidiaMuxer;
+
     int m_width;
     int m_height;
     int m_framerate;
 
     public byte[] configbyte;
-
     //待解码视频缓冲队列
-    public  ArrayBlockingQueue<byte[]> YUVQueue ;
+    public ArrayBlockingQueue<byte[]> YUVQueue;
 
-    public AvcEncoder(ArrayBlockingQueue YUVQueue ,int width, int height, int framerate, int bitrate) {
-        this.YUVQueue= YUVQueue;
-        m_width  = width;
+    public AvcEncoder(ArrayBlockingQueue YUVQueue, int width, int height, int framerate, int bitrate) {
+        this.YUVQueue = YUVQueue;
+        m_width = width;
         m_height = height;
         m_framerate = framerate;
-        MediaFormat mediaFormat = MediaFormat.createVideoFormat("video/avc", width, height);
+        mediaFormat = MediaFormat.createVideoFormat("video/avc", width, height);
         mediaFormat.setInteger(MediaFormat.KEY_COLOR_FORMAT, MediaCodecInfo.CodecCapabilities.COLOR_FormatYUV420SemiPlanar);
-        mediaFormat.setInteger(MediaFormat.KEY_BIT_RATE, width*height*5);
+        mediaFormat.setInteger(MediaFormat.KEY_BIT_RATE, width * height * 5);
         mediaFormat.setInteger(MediaFormat.KEY_FRAME_RATE, 30);
         mediaFormat.setInteger(MediaFormat.KEY_I_FRAME_INTERVAL, 1);
         try {
@@ -55,6 +57,9 @@ public class AvcEncoder
         mediaCodec.configure(mediaFormat, null, null, MediaCodec.CONFIGURE_FLAG_ENCODE);
         //启动编码器
         mediaCodec.start();
+        yMeidiaMuxer = new YMeidiaMuxer(Environment.getExternalStorageDirectory() + File.separator + "muxer.mp4", mediaFormat);
+
+
         //创建保存编码后数据的文件
         createfile();
     }
@@ -62,14 +67,14 @@ public class AvcEncoder
     private static String path = Environment.getExternalStorageDirectory().getAbsolutePath() + "/test1.h264";
     private BufferedOutputStream outputStream;
 
-    private void createfile(){
+    private void createfile() {
         File file = new File(path);
-        if(file.exists()){
+        if (file.exists()) {
             file.delete();
         }
         try {
             outputStream = new BufferedOutputStream(new FileOutputStream(file));
-        } catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
@@ -78,44 +83,45 @@ public class AvcEncoder
         try {
             mediaCodec.stop();
             mediaCodec.release();
-        } catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
     public boolean isRuning = false;
 
-    public void StopThread(){
+    public void StopThread() {
         isRuning = false;
-        try {
+//        try {
             StopEncoder();
-            outputStream.flush();
-            outputStream.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+            yMeidiaMuxer.stopMuxer();
+//            outputStream.flush();
+//            outputStream.close();
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
     }
 
     int count = 0;
 
-    public void StartEncoderThread(){
+    public void StartEncoderThread() {
         Thread EncoderThread = new Thread(new Runnable() {
 
             @Override
             public void run() {
                 isRuning = true;
                 byte[] input = null;
-                long pts =  0;
+                long pts = 0;
                 long generateIndex = 0;
 
                 while (isRuning) {
                     //访问MainActivity用来缓冲待解码数据的队列
-                    if (YUVQueue.size() >0){
+                    if (YUVQueue.size() > 0) {
                         //从缓冲队列中取出一帧
                         input = YUVQueue.poll();
-                        byte[] yuv420sp = new byte[m_width*m_height*3/2];
+                        byte[] yuv420sp = new byte[m_width * m_height * 3 / 2];
                         //把待编码的视频帧转换为YUV420格式
-                        NV21ToNV12(input,yuv420sp,m_width,m_height);
+                        NV21ToNV12(input, yuv420sp, m_width, m_height);
                         input = yuv420sp;
                     }
                     if (input != null) {
@@ -143,19 +149,20 @@ public class AvcEncoder
                                 ByteBuffer outputBuffer = outputBuffers[outputBufferIndex];
                                 byte[] outData = new byte[bufferInfo.size];
                                 outputBuffer.get(outData);
-                                if(bufferInfo.flags == BUFFER_FLAG_CODEC_CONFIG){
+                                if (bufferInfo.flags == BUFFER_FLAG_CODEC_CONFIG) {
                                     configbyte = new byte[bufferInfo.size];
                                     configbyte = outData;
-                                }else if(bufferInfo.flags == BUFFER_FLAG_KEY_FRAME){
+                                } else if (bufferInfo.flags == BUFFER_FLAG_KEY_FRAME) {
                                     byte[] keyframe = new byte[bufferInfo.size + configbyte.length];
                                     System.arraycopy(configbyte, 0, keyframe, 0, configbyte.length);
                                     //把编码后的视频帧从编码器输出缓冲区中拷贝出来
                                     System.arraycopy(outData, 0, keyframe, configbyte.length, outData.length);
-
-                                    outputStream.write(keyframe, 0, keyframe.length);
-                                }else{
+                                    yMeidiaMuxer.startMuxer(bufferInfo);
+//                                    outputStream.write(keyframe, 0, keyframe.length);
+                                } else {
                                     //写到文件中
-                                    outputStream.write(outData, 0, outData.length);
+                                    yMeidiaMuxer.startMuxer(bufferInfo);
+//                                    outputStream.write(outData, 0, outData.length);
                                 }
 
                                 mediaCodec.releaseOutputBuffer(outputBufferIndex, false);
@@ -179,21 +186,19 @@ public class AvcEncoder
 
     }
 
-    private void NV21ToNV12(byte[] nv21,byte[] nv12,int width,int height){
-        if(nv21 == null || nv12 == null)return;
-        int framesize = width*height;
-        int i = 0,j = 0;
+    private void NV21ToNV12(byte[] nv21, byte[] nv12, int width, int height) {
+        if (nv21 == null || nv12 == null) return;
+        int framesize = width * height;
+        int i = 0, j = 0;
         System.arraycopy(nv21, 0, nv12, 0, framesize);
-        for(i = 0; i < framesize; i++){
+        for (i = 0; i < framesize; i++) {
             nv12[i] = nv21[i];
         }
-        for (j = 0; j < framesize/2; j+=2)
-        {
-            nv12[framesize + j-1] = nv21[j+framesize];
+        for (j = 0; j < framesize / 2; j += 2) {
+            nv12[framesize + j - 1] = nv21[j + framesize];
         }
-        for (j = 0; j < framesize/2; j+=2)
-        {
-            nv12[framesize + j] = nv21[j+framesize-1];
+        for (j = 0; j < framesize / 2; j += 2) {
+            nv12[framesize + j] = nv21[j + framesize - 1];
         }
     }
 

@@ -1,5 +1,6 @@
 package com.opengl.opengltest;
 
+import android.graphics.ImageFormat;
 import android.graphics.Point;
 import android.graphics.SurfaceTexture;
 import android.hardware.Camera;
@@ -8,6 +9,7 @@ import android.view.SurfaceHolder;
 import com.opengl.opengltest.utils.CameraSizeComparator;
 
 import java.io.IOException;
+import java.security.PublicKey;
 import java.util.Collections;
 import java.util.List;
 
@@ -41,6 +43,8 @@ public class LowCamera implements ICamera {
         preSize = getPropPreviewSize(parameters.getSupportedPreviewSizes(), mConfig.rate, mConfig.minPreviewWidth);
         parameters.setPreviewSize(preSize.width, preSize.height);
         parameters.setFocusMode(Camera.Parameters.FOCUS_MODE_CONTINUOUS_VIDEO);
+        //设置预览格式
+        parameters.setPreviewFormat(ImageFormat.NV21);
         mPreSize = new Point(preSize.width, preSize.height);
         mCamera.setParameters(parameters);
 
@@ -144,6 +148,16 @@ public class LowCamera implements ICamera {
         }
     }
 
+    public void setOnPreviewBufferCallback(final PreviewFrameCallback callback) {
+        if (mCamera != null) {
+            mCamera.setPreviewCallbackWithBuffer(new Camera.PreviewCallback() {
+                @Override
+                public void onPreviewFrame(byte[] data, Camera camera) {
+                    callback.onPreviewFrame(data, mPreSize.x, mPreSize.y);
+                }
+            });
+        }
+    }
     private Camera.Size getPropPreviewSize(List<Camera.Size> list, float th, int minWidth) {
         Collections.sort(list, sizeComparator);
 

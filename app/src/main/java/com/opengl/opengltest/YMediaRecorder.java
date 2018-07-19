@@ -51,7 +51,7 @@ public class YMediaRecorder {
         // 3.设置图像编码的格式
         mediaRecorder.setVideoEncoder(MediaRecorder.VideoEncoder.H264);
         // 4.设置视频录制的分辨率。必须放在设置编码和格式的后面，否则报错
-        mediaRecorder.setVideoSize(1920, 1080);
+        mediaRecorder.setVideoSize(1080, 1920);
         // 4.设置录制的视频帧率。必须放在设置编码和格式的后面，否则报错
         mediaRecorder.setVideoFrameRate(30);
         // 4.设置录制的视频比特率。必须放在设置编码和格式的后面，否则报错

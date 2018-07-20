@@ -8,6 +8,7 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import com.opengl.opengltest.encode.AvcEncoder;
+import com.opengl.opengltest.encode.H264EncodeConsumer;
 import com.opengl.opengltest.encode.PreviewBufferInfo;
 
 import java.util.Queue;
@@ -25,6 +26,7 @@ public class MediaCodecEncodeActivity extends Activity implements View.OnClickLi
     public static ArrayBlockingQueue<byte[]> YUVQueue = new ArrayBlockingQueue<byte[]>(yuvqueuesize);
 
     YSurfaceView ySurfaceView;
+    private H264EncodeConsumer mH264Consumer;
     TextView capture;
     Button btnStart;
     Button btnStop;
@@ -64,8 +66,9 @@ public class MediaCodecEncodeActivity extends Activity implements View.OnClickLi
         ySurfaceView.setFrameCallback(new YSurfaceView.OnFrameCallback() {
             @Override
             public void frameCallback(byte[] bytes, int width, int height) {
+
                 //将当前帧图像保存在队列中
-                putYUVData(bytes, bytes.length);
+//                putYUVData(bytes, bytes.length);
             }
         });
     }

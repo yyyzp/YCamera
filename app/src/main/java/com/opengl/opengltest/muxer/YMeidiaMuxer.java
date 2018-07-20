@@ -36,7 +36,7 @@ public class YMeidiaMuxer {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        byteBuffer = ByteBuffer.allocate(500 * 1024);
+        byteBuffer = ByteBuffer.allocate(1024 * 1024*5);
         videoTrackIndex = mMediaMuxer.addTrack(mMediaFormat);
         mMediaMuxer.start();
     }

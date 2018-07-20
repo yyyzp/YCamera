@@ -1,8 +1,10 @@
 package com.opengl.opengltest.encode;
 
+import android.annotation.TargetApi;
 import android.media.MediaCodec;
 import android.media.MediaCodecInfo;
 import android.media.MediaFormat;
+import android.os.Build;
 import android.os.Environment;
 
 import com.opengl.opengltest.MainActivity;
@@ -44,6 +46,11 @@ public class AvcEncoder {
         m_height = height;
         m_framerate = framerate;
         mediaFormat = MediaFormat.createVideoFormat("video/avc", width, height);
+        byte[] header_sps = {0, 0, 0, 1, 103, 100, 0, 31, -84, -76, 2, -128, 45, -56};
+        byte[] header_pps = {0, 0, 0, 1, 104, -18, 60, 97, 15, -1, -16, -121, -1, -8, 67, -1, -4, 33, -1, -2, 16, -1, -1, 8, 127, -1, -64};
+        mediaFormat.setByteBuffer("csd-0", ByteBuffer.wrap(header_sps));
+        mediaFormat.setByteBuffer("csd-1", ByteBuffer.wrap(header_pps));
+
         mediaFormat.setInteger(MediaFormat.KEY_COLOR_FORMAT, MediaCodecInfo.CodecCapabilities.COLOR_FormatYUV420SemiPlanar);
         mediaFormat.setInteger(MediaFormat.KEY_BIT_RATE, width * height * 5);
         mediaFormat.setInteger(MediaFormat.KEY_FRAME_RATE, 30);
@@ -93,8 +100,8 @@ public class AvcEncoder {
     public void StopThread() {
         isRuning = false;
 //        try {
-            StopEncoder();
-            yMeidiaMuxer.stopMuxer();
+        StopEncoder();
+        yMeidiaMuxer.stopMuxer();
 //            outputStream.flush();
 //            outputStream.close();
 //        } catch (IOException e) {
@@ -103,6 +110,66 @@ public class AvcEncoder {
     }
 
     int count = 0;
+
+//    public void addData(byte[] yuvData) {
+//        if (!isEncoderStart || mParamsRef == null)
+//            return;
+//        try {
+//            if (lastPush == 0) {
+//                lastPush = System.currentTimeMillis();
+//            }
+//            long time = System.currentTimeMillis() - lastPush;
+//            if (time >= 0) {
+//                time = millisPerframe - time;
+//                if (time > 0)
+//                    Thread.sleep(time / 2);
+//            }
+//
+//            //前置摄像头旋转270度，后置摄像头旋转90度
+//            EncoderParams mParams = mParamsRef.get();
+//            int mWidth = mParams.getFrameWidth();
+//            int mHeight = mParams.getFrameHeight();
+//            // 转换颜色格式
+////            if(mColorFormat == COLOR_FormatYUV420PackedPlanar){
+////                JNIUtil.nV21To420SP(yuvData, mWidth, mHeight);
+////                // 将数据写入编码器
+////                feedMediaCodecData(yuvData);
+////            }else{
+//            byte[] resultBytes = new byte[mWidth * mHeight * 3 / 2];
+//            YuvUtils.transferColorFormat(yuvData, mWidth, mHeight, resultBytes, mColorFormat);
+//            // 将数据写入编码器
+//            feedMediaCodecData(resultBytes);
+////            }
+////            JNIUtil.nV21To420SP(yuvData, mWidth, mHeight);
+////            feedMediaCodecData(yuvData);
+//
+//            if (time > 0)
+//                Thread.sleep(time / 2);
+//            lastPush = System.currentTimeMillis();
+//        } catch (InterruptedException e) {
+//            e.printStackTrace();
+//        }
+//    }
+
+    @TargetApi(21)
+    private void feedMediaCodecData(byte[] data) {
+        ByteBuffer[] inputBuffers = mediaCodec.getInputBuffers();
+        int inputBufferIndex = mediaCodec.dequeueInputBuffer(TIMEOUT_USEC);
+        if (inputBufferIndex >= 0) {
+            // 绑定一个被空的、可写的输入缓存区inputBuffer到客户端
+            ByteBuffer inputBuffer = null;
+            if (android.os.Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
+                inputBuffer = inputBuffers[inputBufferIndex];
+            } else {
+                inputBuffer = mediaCodec.getInputBuffer(inputBufferIndex);
+            }
+            // 向输入缓存区写入有效原始数据，并提交到编码器中进行编码处理
+            inputBuffer.clear();
+            inputBuffer.put(data);
+            inputBuffer.clear();
+            mediaCodec.queueInputBuffer(inputBufferIndex, 0, data.length, System.nanoTime() / 1000, MediaCodec.BUFFER_FLAG_KEY_FRAME);
+        }
+    }
 
     public void StartEncoderThread() {
         Thread EncoderThread = new Thread(new Runnable() {
@@ -115,7 +182,7 @@ public class AvcEncoder {
                 long generateIndex = 0;
 
                 while (isRuning) {
-                    //访问MainActivity用来缓冲待解码数据的队列
+                    //访问用来缓冲待解码数据的队列
                     if (YUVQueue.size() > 0) {
                         //从缓冲队列中取出一帧
                         input = YUVQueue.poll();
@@ -141,6 +208,7 @@ public class AvcEncoder {
                                 mediaCodec.queueInputBuffer(inputBufferIndex, 0, input.length, pts, 0);
                                 generateIndex += 1;
                             }
+
 
                             MediaCodec.BufferInfo bufferInfo = new MediaCodec.BufferInfo();
                             int outputBufferIndex = mediaCodec.dequeueOutputBuffer(bufferInfo, TIMEOUT_USEC);

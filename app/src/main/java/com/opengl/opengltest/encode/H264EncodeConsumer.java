@@ -220,7 +220,7 @@ public class H264EncodeConsumer extends Thread {
             // 向输入缓存区写入有效原始数据，并提交到编码器中进行编码处理
             inputBuffer.clear();
             inputBuffer.put(data);
-            inputBuffer.clear();
+//            inputBuffer.clear();
             mVideoEncodec.queueInputBuffer(inputBufferIndex, 0, data.length, System.nanoTime() / 1000, MediaCodec.BUFFER_FLAG_KEY_FRAME);
         }
     }
@@ -269,7 +269,7 @@ public class H264EncodeConsumer extends Thread {
                     }
                         Log.i(TAG, "编码器输出缓存区格式改变，添加视频轨道到混合器");
                 } else {
-                    // 获取一个只读的输出缓存区inputBuffer ，它包含被编码好的数据
+                    // 获取一个只读的输出缓存区outputBuffer ，它包含被编码好的数据
                     ByteBuffer outputBuffer = null;
                     if (!isLollipop()) {
                         outputBuffer = outputBuffers[outputBufferIndex];

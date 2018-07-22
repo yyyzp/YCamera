@@ -10,6 +10,7 @@ import android.widget.TextView;
 import com.opengl.opengltest.encode.AvcEncoder;
 import com.opengl.opengltest.encode.H264EncodeConsumer;
 import com.opengl.opengltest.encode.PreviewBufferInfo;
+import com.opengl.opengltest.encode.YVideoEncoder;
 
 import java.util.Queue;
 import java.util.concurrent.ArrayBlockingQueue;
@@ -26,11 +27,10 @@ public class MediaCodecEncodeActivity extends Activity implements View.OnClickLi
     public static ArrayBlockingQueue<byte[]> YUVQueue = new ArrayBlockingQueue<byte[]>(yuvqueuesize);
 
     YSurfaceView ySurfaceView;
-    private H264EncodeConsumer mH264Consumer;
+    YVideoEncoder yVideoEncoder;
     TextView capture;
     Button btnStart;
     Button btnStop;
-    AvcEncoder avcEncoder;
     private int width;
     private int height;
     private int frameRate;
@@ -54,11 +54,14 @@ public class MediaCodecEncodeActivity extends Activity implements View.OnClickLi
 //        yVideoEncoder = new YVideoEncoder();
 //        yVideoEncoder.configure();
 //        yVideoEncoder.start();
-        width = 1280;
-        height = 720;
-        frameRate = 30;
-        bitRate = 1024 * 1024 * 5;
-        avcEncoder = new AvcEncoder(YUVQueue, width, height, frameRate, bitRate);
+//        width = 1280;
+//        height = 720;
+//        frameRate = 30;
+//        bitRate = 1024 * 1024 * 5;
+        yVideoEncoder = new YVideoEncoder();
+        yVideoEncoder.configure();
+        yVideoEncoder.start();
+//        avcEncoder = new AvcEncoder(YUVQueue, width, height, frameRate, bitRate);
 
     }
 
@@ -66,7 +69,7 @@ public class MediaCodecEncodeActivity extends Activity implements View.OnClickLi
         ySurfaceView.setFrameCallback(new YSurfaceView.OnFrameCallback() {
             @Override
             public void frameCallback(byte[] bytes, int width, int height) {
-
+                yVideoEncoder.input(bytes, -1);
                 //将当前帧图像保存在队列中
 //                putYUVData(bytes, bytes.length);
             }
@@ -78,29 +81,24 @@ public class MediaCodecEncodeActivity extends Activity implements View.OnClickLi
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.btn_start:
-//                initPreviewFrameBuffer();
                 ySurfaceView.getCamera().setOnPreviewFrameCallback(new ICamera.PreviewFrameCallback() {
                     @Override
                     public void onPreviewFrame(byte[] bytes, int width, int height) {
-                        //将当前帧图像保存在队列中
-                        putYUVData(bytes, bytes.length);
+                        yVideoEncoder.input(bytes, -1);
                     }
                 });
-                //启动编码线程
-                avcEncoder.StartEncoderThread();
+                yVideoEncoder.drainEncoder(false);
+//                initPreviewFrameBuffer();
+
+
                 break;
             case R.id.btn_stop:
-                avcEncoder.StopThread();
+                yVideoEncoder.releaseEncoder();
                 break;
             default:
                 break;
         }
     }
 
-    public void putYUVData(byte[] buffer, int length) {
-        if (YUVQueue.size() >= 10) {
-            YUVQueue.poll();
-        }
-        YUVQueue.add(buffer);
-    }
+
 }

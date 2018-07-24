@@ -15,6 +15,8 @@ import java.util.Vector;
 
 /**
  * Created by Answer on 2018/7/23.
+ * 线程启动 等待相机预览onPreviewFrame 返回数据 加入到队列中 向mediaCodec 输入缓冲区输入原始yuv数据
+ * 从mediacodec 输出缓冲区中拿到编码后的数据 加入muxer队列中
  */
 
 public class VideoRunnable extends Thread {

@@ -15,6 +15,8 @@ import java.nio.ByteBuffer;
 
 /**
  * Created by Answer on 2018/7/23.
+ * 线程启动 打开AudioRecorder 向mediaCodec 输入缓冲区输入原始pcm数据
+ * 从mediacodec 输出缓冲区中拿到编码后的数据 加入muxer队列中
  */
 
 public class AudioRunnable extends Thread {
@@ -23,16 +25,16 @@ public class AudioRunnable extends Thread {
     public static final int SAMPLES_PER_FRAME = 1024;    // AAC, frameBytes/frame/channel
     public static final int FRAMES_PER_BUFFER = 25;    // AAC, frame/buffer/sec
     protected static final int TIMEOUT_USEC = 10000;    // 10[msec]
-    private static final String MIME_TYPE = "audio/mp4a-latm";
+    private static final String MIME_TYPE = "audio/aac";
     //    private static final String MIME_TYPE = "audio/amr-wb";
 //    private static final int SAMPLE_RATE = 44100;    // 44.1[KHz] is only setting guaranteed to be available on all devices.
-    private static final int SAMPLE_RATE = 16000;    // 44.1[KHz] is only setting guaranteed to be available on all devices.
+    private static final int SAMPLE_RATE = 44100;    // 44.1[KHz] is only setting guaranteed to be available on all devices.
     //    private static final int BIT_RATE = 16000;
     private static final int BIT_RATE = 64000;
     /*音轨数据源 mic就行吧?*/
     private static final int[] AUDIO_SOURCES = new int[]{
-            MediaRecorder.AudioSource.DEFAULT
-//            MediaRecorder.AudioSource.MIC,
+//            MediaRecorder.AudioSource.DEFAULT
+            MediaRecorder.AudioSource.MIC,
 //            MediaRecorder.AudioSource.CAMCORDER,
 //            MediaRecorder.AudioSource.VOICE_COMMUNICATION,
 //            MediaRecorder.AudioSource.VOICE_RECOGNITION,
@@ -94,7 +96,7 @@ public class AudioRunnable extends Thread {
 
         audioFormat = MediaFormat.createAudioFormat(MIME_TYPE, SAMPLE_RATE, 1);
 //        audioFormat.setInteger(MediaFormat.KEY_AAC_PROFILE, MediaCodecInfo.CodecProfileLevel.AACObjectLC);
-//        audioFormat.setInteger(MediaFormat.KEY_CHANNEL_MASK, AudioFormat.CHANNEL_IN_MONO);//CHANNEL_IN_STEREO 立体声
+        audioFormat.setInteger(MediaFormat.KEY_CHANNEL_MASK, AudioFormat.CHANNEL_IN_MONO);//CHANNEL_IN_STEREO 立体声
         audioFormat.setInteger(MediaFormat.KEY_BIT_RATE, BIT_RATE);
         audioFormat.setInteger(MediaFormat.KEY_CHANNEL_COUNT, 1);
         audioFormat.setInteger(MediaFormat.KEY_SAMPLE_RATE, SAMPLE_RATE);

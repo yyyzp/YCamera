@@ -14,6 +14,8 @@ import android.util.AttributeSet;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
+import com.opengl.opengltest.encode.YMediaMuxer;
+
 /**
  * Description:
  */
@@ -21,7 +23,7 @@ public class YSurfaceView extends SurfaceView implements SurfaceHolder.Callback2
 
     private LowCamera mCamera2;
     private int cameraId = 0;
-    private OnFrameCallback onFrameCallback;
+    YMediaMuxer yMediaMuxer;
 
     public YSurfaceView(Context context) {
         this(context, null);
@@ -35,6 +37,7 @@ public class YSurfaceView extends SurfaceView implements SurfaceHolder.Callback2
     private void init() {
         mCamera2 = new LowCamera();
         getHolder().addCallback(this);
+        yMediaMuxer = new YMediaMuxer();
     }
 
 
@@ -49,12 +52,7 @@ public class YSurfaceView extends SurfaceView implements SurfaceHolder.Callback2
         Point point = mCamera2.getPreviewSize();
         mCamera2.setPreviewSurface(holder);
         mCamera2.preview();
-//        mCamera2.setOnPreviewFrameCallback(new ICamera.PreviewFrameCallback() {
-//            @Override
-//            public void onPreviewFrame(byte[] bytes, int width, int height) {
-//                onFrameCallback.frameCallback(bytes, width, height);
-//            }
-//        });
+
     }
 
     @Override
@@ -73,11 +71,4 @@ public class YSurfaceView extends SurfaceView implements SurfaceHolder.Callback2
         return mCamera2;
     }
 
-    public void setFrameCallback(OnFrameCallback onFrameCallback) {
-        this.onFrameCallback = onFrameCallback;
-    }
-
-    public interface OnFrameCallback {
-        void frameCallback(byte[] bytes, int width, int height);
-    }
 }

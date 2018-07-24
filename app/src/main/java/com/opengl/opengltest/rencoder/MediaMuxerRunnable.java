@@ -18,6 +18,7 @@ import java.util.Vector;
 
 /**
  * Created by Answer on 2018/7/23.
+ * 开启线程 从队列中拿到编码后的aac h264数据 使用MediaMuxer混合 生成MP4
  */
 
 public class MediaMuxerRunnable extends Thread {

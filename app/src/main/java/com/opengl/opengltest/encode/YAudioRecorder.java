@@ -35,7 +35,7 @@ public class YAudioRecorder extends Thread {
     private static final String MIME_TYPE = "audio/mp4a-latm";// - AAC audio (note, this is raw AAC packets, not packaged in LATM!)
     private int SAMPLE_RATE_INHZ = 44100;
     private static final int BIT_RATE = 16000;
-    private boolean isRecording = false;
+    private boolean isRecording = true;
     private boolean isExit = false;
     private int CHANNEL_CONFIG = AudioFormat.CHANNEL_IN_STEREO;
     private int AUDIO_FORMAT = AudioFormat.ENCODING_PCM_16BIT;
@@ -102,13 +102,16 @@ public class YAudioRecorder extends Thread {
 //      audioFormat.setLong(MediaFormat.KEY_DURATION, (long)durationInMs );
         if (DEBUG) if (DEBUG) Log.i(TAG, "format: " + audioFormat);
         mMediaCodec.configure(audioFormat, null, null, MediaCodec.CONFIGURE_FLAG_ENCODE);
-    }
-
-    public void start() {
         mAudioRecord.startRecording();
         mMediaCodec.start();
-        isRecording = true;
+
     }
+
+//    public void start() {
+//        mAudioRecord.startRecording();
+//        mMediaCodec.start();
+//        isRecording = true;
+//    }
 
 //    public void recording() {
 //        new Thread(new Runnable() {

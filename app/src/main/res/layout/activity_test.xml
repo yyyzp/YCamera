@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+<com.opengl.opengltest.BubbleLayout
+    android:id="@+id/bubble"
+    android:layout_width="200dp"
+    android:layout_height="200dp"
+    app:bubble_strokeWidth="1dp"
+    app:bubble_cornerRadius="6dp"
+    app:bubble_bubbleHOffset="20dp"
+    app:bubble_bubbleWidth="18dp"
+    app:bubble_bubbleHeight="10dp"
+    app:bubble_color="#eaeaea"
+    app:layout_constraintTop_toTopOf="parent"
+    app:layout_constraintBottom_toBottomOf="parent"
+    app:layout_constraintLeft_toLeftOf="parent"
+    app:layout_constraintRight_toRightOf="parent"
+    />
+</android.support.constraint.ConstraintLayout>

@@ -25,16 +25,16 @@ public class AudioRunnable extends Thread {
     public static final int SAMPLES_PER_FRAME = 1024;    // AAC, frameBytes/frame/channel
     public static final int FRAMES_PER_BUFFER = 25;    // AAC, frame/buffer/sec
     protected static final int TIMEOUT_USEC = 10000;    // 10[msec]
-    private static final String MIME_TYPE = "audio/aac";
+    private static final String MIME_TYPE = "audio/mp4a-latm";//AAC
     //    private static final String MIME_TYPE = "audio/amr-wb";
 //    private static final int SAMPLE_RATE = 44100;    // 44.1[KHz] is only setting guaranteed to be available on all devices.
-    private static final int SAMPLE_RATE = 44100;    // 44.1[KHz] is only setting guaranteed to be available on all devices.
+    private static final int SAMPLE_RATE = 16000;    // 44.1[KHz] is only setting guaranteed to be available on all devices.
     //    private static final int BIT_RATE = 16000;
     private static final int BIT_RATE = 64000;
     /*音轨数据源 mic就行吧?*/
     private static final int[] AUDIO_SOURCES = new int[]{
-//            MediaRecorder.AudioSource.DEFAULT
-            MediaRecorder.AudioSource.MIC,
+            MediaRecorder.AudioSource.DEFAULT
+//            MediaRecorder.AudioSource.MIC,
 //            MediaRecorder.AudioSource.CAMCORDER,
 //            MediaRecorder.AudioSource.VOICE_COMMUNICATION,
 //            MediaRecorder.AudioSource.VOICE_RECOGNITION,
@@ -95,8 +95,8 @@ public class AudioRunnable extends Thread {
         if (DEBUG) if (DEBUG) Log.i(TAG, "selected codec: " + audioCodecInfo.getName());
 
         audioFormat = MediaFormat.createAudioFormat(MIME_TYPE, SAMPLE_RATE, 1);
-//        audioFormat.setInteger(MediaFormat.KEY_AAC_PROFILE, MediaCodecInfo.CodecProfileLevel.AACObjectLC);
-        audioFormat.setInteger(MediaFormat.KEY_CHANNEL_MASK, AudioFormat.CHANNEL_IN_MONO);//CHANNEL_IN_STEREO 立体声
+        audioFormat.setInteger(MediaFormat.KEY_AAC_PROFILE, MediaCodecInfo.CodecProfileLevel.AACObjectLC);
+        audioFormat.setInteger(MediaFormat.KEY_CHANNEL_MASK, AudioFormat.CHANNEL_IN_STEREO);//CHANNEL_IN_STEREO 立体声
         audioFormat.setInteger(MediaFormat.KEY_BIT_RATE, BIT_RATE);
         audioFormat.setInteger(MediaFormat.KEY_CHANNEL_COUNT, 1);
         audioFormat.setInteger(MediaFormat.KEY_SAMPLE_RATE, SAMPLE_RATE);
@@ -205,7 +205,7 @@ public class AudioRunnable extends Thread {
                     buf.flip();
 //                    if(DEBUG) Log.e("ang-->", "解码音频数据:" + readBytes);
                     try {
-                        encode(buf, readBytes, getPTSUs());
+                        encode(buf, readBytes, System.nanoTime() / 1000);
                     } catch (Exception e) {
                         if (DEBUG) Log.e("angcyo-->", "解码音频(Audio)数据 失败");
                         e.printStackTrace();
@@ -283,8 +283,8 @@ public class AudioRunnable extends Thread {
                 }
 
                 if (mBufferInfo.size != 0 && muxer != null) {
-                    mBufferInfo.presentationTimeUs = getPTSUs();
-                    if(DEBUG) Log.e("angcyo-->", "添加音频数据 " + mBufferInfo.size);
+                    mBufferInfo.presentationTimeUs = System.nanoTime() / 1000;
+                    if (DEBUG) Log.e("angcyo-->", "添加音频数据 " + mBufferInfo.size);
                     muxer.addMuxerData(new MediaMuxerRunnable.MuxerData(
                             MediaMuxerRunnable.TRACK_AUDIO, encodedData, mBufferInfo));
                     prevOutputPTSUs = mBufferInfo.presentationTimeUs;

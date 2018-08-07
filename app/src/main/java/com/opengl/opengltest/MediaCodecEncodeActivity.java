@@ -16,6 +16,7 @@ import com.opengl.opengltest.encode.H264EncodeConsumer;
 import com.opengl.opengltest.encode.PreviewBufferInfo;
 import com.opengl.opengltest.encode.YMediaMuxer;
 import com.opengl.opengltest.encode.YVideoEncoder;
+import com.opengl.opengltest.rencoder.MediaMuxerRunnable;
 
 import java.util.Queue;
 import java.util.concurrent.ArrayBlockingQueue;
@@ -42,32 +43,32 @@ public class MediaCodecEncodeActivity extends Activity implements View.OnClickLi
     private int frameRate;
     private int bitRate;
     SurfaceHolder mSurfaceHolder;
-    YMediaMuxer yMediaMuxer;
+    MediaMuxerRunnable yMediaMuxer;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_codec_endode);
-        ySurfaceView = findViewById(R.id.surfaceview);
-        yMediaMuxer=new YMediaMuxer();
-//        mSurfaceView = findViewById(R.id.surfaceview);
-//        openCamera();
-//        mSurfaceView.getHolder().addCallback(new SurfaceHolder.Callback() {
-//            @Override
-//            public void surfaceCreated(SurfaceHolder holder) {
-//                mSurfaceHolder=holder;
-//            }
-//
-//            @Override
-//            public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
-//
-//            }
-//
-//            @Override
-//            public void surfaceDestroyed(SurfaceHolder holder) {
-//
-//            }
-//        });
+//        ySurfaceView = findViewById(R.id.surfaceview);
+        mSurfaceView = findViewById(R.id.surfaceview);
+        mSurfaceView.getHolder().addCallback(new SurfaceHolder.Callback() {
+            @Override
+            public void surfaceCreated(SurfaceHolder holder) {
+                mSurfaceHolder=holder;
+                openCamera();
+
+            }
+
+            @Override
+            public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
+
+            }
+
+            @Override
+            public void surfaceDestroyed(SurfaceHolder holder) {
+
+            }
+        });
         capture = findViewById(R.id.capture);
         btnStart = findViewById(R.id.btn_start);
         btnStop = findViewById(R.id.btn_stop);
@@ -99,28 +100,13 @@ public class MediaCodecEncodeActivity extends Activity implements View.OnClickLi
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.btn_start:
-//                ySurfaceView.getCamera().setOnPreviewFrameCallback(new ICamera.PreviewFrameCallback() {
-//                    @Override
-//                    public void onPreviewFrame(byte[] bytes, int width, int height) {
-//                        yVideoEncoder.input(bytes, -1);
-//                    }
-//                });
-//                yVideoEncoder.drainEncoder(false);
-//                initPreviewFrameBuffer();
-//                CameraWrapper.getInstance().doStartRecorder();
-                ySurfaceView.getCamera().setOnPreviewFrameCallback(new ICamera.PreviewFrameCallback() {
-                    @Override
-                    public void onPreviewFrame(byte[] bytes, int width, int height) {
-                        yMediaMuxer.addVideoFrameData(bytes);
-                    }
-                });
-                yMediaMuxer.startMuxer();
+                CameraWrapper.getInstance().doStartRecorder();
+
 
                 break;
             case R.id.btn_stop:
 //                yVideoEncoder.releaseEncoder();
-//                CameraWrapper.getInstance().doStopCamera();
-                yMediaMuxer.stopMuxer();
+                CameraWrapper.getInstance().doStopCamera();
                 break;
             default:
                 break;

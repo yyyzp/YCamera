@@ -24,12 +24,13 @@ public class VideoRunnable extends Thread {
     private static final boolean VERBOSE = false; // lots of logging
     // parameters for the encoder
     private static final String MIME_TYPE = "video/avc"; // H.264 Advanced Video
-    private static final int FRAME_RATE = 25; // 15fps
-    private static final int IFRAME_INTERVAL = 10; // 10 between
-    // I-frames
+    private static final int FRAME_RATE = 25; // 25fps
+    private static final int IFRAME_INTERVAL = 10; // 1 sec between  I-frames
+
     private static final int TIMEOUT_USEC = 10000;
     private static final int COMPRESS_RATIO = 256;
-    private static final int BIT_RATE = CameraWrapper.IMAGE_HEIGHT * CameraWrapper.IMAGE_WIDTH * 3 * 8 * FRAME_RATE / COMPRESS_RATIO; // bit rate CameraWrapper.
+    private static final int BIT_RATE = 5 * 1024 * 1024; // bit rate CameraWrapper.
+    //    private static final int BIT_RATE = CameraWrapper.IMAGE_HEIGHT * CameraWrapper.IMAGE_WIDTH * 3 * 8 * FRAME_RATE / COMPRESS_RATIO; // bit rate CameraWrapper.
     public static boolean DEBUG = false;
     private final Object lock = new Object();
     byte[] mFrameData;
@@ -45,6 +46,7 @@ public class VideoRunnable extends Thread {
     private MediaFormat mediaFormat;
     private MediaCodecInfo codecInfo;
     private volatile boolean isStart = false;
+    private boolean isAddKeyFrame = false;
 
     public VideoRunnable(int mWidth, int mHeight, WeakReference<MediaMuxerRunnable> mediaMuxerRunnable) {
         this.mWidth = mWidth;
@@ -138,14 +140,14 @@ public class VideoRunnable extends Thread {
         }
         if (VERBOSE)
             if (DEBUG) Log.d(TAG, "found codec: " + codecInfo.getName());
-        mColorFormat = selectColorFormat(codecInfo, MIME_TYPE);
-        if (VERBOSE)
-            if (DEBUG) Log.d(TAG, "found colorFormat: " + mColorFormat);
+//        mColorFormat = selectColorFormat(codecInfo, MIME_TYPE);
+//        if (VERBOSE)
+//            if (DEBUG) Log.d(TAG, "found colorFormat: " + mColorFormat);
         mediaFormat = MediaFormat.createVideoFormat(MIME_TYPE,
                 this.mWidth, this.mHeight);
         mediaFormat.setInteger(MediaFormat.KEY_BIT_RATE, BIT_RATE);
         mediaFormat.setInteger(MediaFormat.KEY_FRAME_RATE, FRAME_RATE);
-        mediaFormat.setInteger(MediaFormat.KEY_COLOR_FORMAT, mColorFormat);
+        mediaFormat.setInteger(MediaFormat.KEY_COLOR_FORMAT, MediaCodecInfo.CodecCapabilities.COLOR_FormatYUV420SemiPlanar);
         mediaFormat.setInteger(MediaFormat.KEY_I_FRAME_INTERVAL, IFRAME_INTERVAL);
         if (VERBOSE)
             if (DEBUG) Log.d(TAG, "format: " + mediaFormat);
@@ -179,7 +181,7 @@ public class VideoRunnable extends Thread {
         if (VERBOSE)
             if (DEBUG) Log.i(TAG, "encodeFrame()");
         NV21toI420SemiPlanar(input, mFrameData, this.mWidth, this.mHeight);
-
+        mFrameData = input;
         ByteBuffer[] inputBuffers = mMediaCodec.getInputBuffers();
         ByteBuffer[] outputBuffers = mMediaCodec.getOutputBuffers();
         int inputBufferIndex = mMediaCodec.dequeueInputBuffer(TIMEOUT_USEC);
@@ -201,7 +203,7 @@ public class VideoRunnable extends Thread {
                 if (DEBUG) Log.d(TAG, "input buffer not available");
         }
 
-        int outputBufferIndex = mMediaCodec.dequeueOutputBuffer(mBufferInfo, TIMEOUT_USEC);
+        int outputBufferIndex = mMediaCodec.dequeueOutputBuffer(mBufferInfo, System.nanoTime() / 1000);
         if (VERBOSE)
             if (DEBUG) Log.i(TAG, "outputBufferIndex-->" + outputBufferIndex);
         do {
@@ -227,6 +229,11 @@ public class VideoRunnable extends Thread {
                     throw new RuntimeException("encoderOutputBuffer " + outputBufferIndex +
                             " was null");
                 }
+                int type = outputBuffer.get(4) & 0x1F;
+                if (type == 7 || type == 8) {
+                    Log.i(TAG, "------PPS、SPS帧(非图像数据)，忽略-------");
+                    mBufferInfo.size = 0;
+                }
                 if ((mBufferInfo.flags & MediaCodec.BUFFER_FLAG_CODEC_CONFIG) != 0) {
                     // The codec config data was pulled out and fed to the muxer when we got
                     // the INFO_OUTPUT_FORMAT_CHANGED status.  Ignore it.
@@ -235,29 +242,36 @@ public class VideoRunnable extends Thread {
                 }
                 if (mBufferInfo.size != 0) {
                     MediaMuxerRunnable mediaMuxerRunnable = this.mediaMuxerRunnable.get();
-
-//                    if (mediaMuxerRunnable != null) {
-//                        MediaFormat newFormat = mMediaCodec.getOutputFormat();
-//                        if (DEBUG) Log.e("angcyo-->", "添加视轨 mBufferInfo " + newFormat.toString());
-////                        mediaMuxerRunnable.addTrackIndex(MediaMuxerRunnable.TRACK_VIDEO, newFormat);
-//                        mediaMuxerRunnable.setMediaFormat(MediaMuxerRunnable.TRACK_VIDEO, newFormat);
-//                    }
-                    // adjust the ByteBuffer values to match BufferInfo (not needed?)
                     outputBuffer.position(mBufferInfo.offset);
                     outputBuffer.limit(mBufferInfo.offset + mBufferInfo.size);
+                    if (type == 5) {
+                        Log.i(TAG, "------I帧(关键帧)，添加到混合器-------");
 
-                    if (mediaMuxerRunnable != null) {
-                        if (DEBUG) Log.e("angcyo-->", "添加视轨 数据 " + mBufferInfo.size);
-                        mediaMuxerRunnable.addMuxerData(new MediaMuxerRunnable.MuxerData(
-                                MediaMuxerRunnable.TRACK_VIDEO, outputBuffer, mBufferInfo
-                        ));
-                    }
-                    if (VERBOSE) {
-                        if (DEBUG) Log.d(TAG, "sent " + mBufferInfo.size + " frameBytes to muxer");
+                        if (mediaMuxerRunnable != null) {
+                            if (DEBUG) Log.e("angcyo-->", "添加视轨 数据 " + mBufferInfo.size);
+                            mediaMuxerRunnable.addMuxerData(new MediaMuxerRunnable.MuxerData(
+                                    MediaMuxerRunnable.TRACK_VIDEO, outputBuffer, mBufferInfo
+                            ));
+                        }
+                        isAddKeyFrame = true;
+                    } else {
+                        if (isAddKeyFrame) {
+                            Log.d(TAG, "------非I帧(type=1)，添加到混合器-------");
+                            if (mediaMuxerRunnable != null) {
+                                if (DEBUG) Log.e("angcyo-->", "添加视轨 数据 " + mBufferInfo.size);
+                                mediaMuxerRunnable.addMuxerData(new MediaMuxerRunnable.MuxerData(
+                                        MediaMuxerRunnable.TRACK_VIDEO, outputBuffer, mBufferInfo
+                                ));
+                            }
+                        }
                     }
                 }
-                mMediaCodec.releaseOutputBuffer(outputBufferIndex, false);
+
+                if (VERBOSE) {
+                    if (DEBUG) Log.d(TAG, "sent " + mBufferInfo.size + " frameBytes to muxer");
+                }
             }
+            mMediaCodec.releaseOutputBuffer(outputBufferIndex, false);
             outputBufferIndex = mMediaCodec.dequeueOutputBuffer(mBufferInfo, TIMEOUT_USEC);
         } while (outputBufferIndex >= 0);
     }

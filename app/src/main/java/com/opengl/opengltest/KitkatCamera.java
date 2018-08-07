@@ -32,39 +32,40 @@ public class KitkatCamera implements ICamera {
     private Point mPicSize;
     private Point mPreSize;
 
-    public KitkatCamera(){
-        this.mConfig=new Config();
-        mConfig.minPreviewWidth=720;
-        mConfig.minPictureWidth=720;
-        mConfig.rate=1.778f;
-        sizeComparator=new CameraSizeComparator();
+    public KitkatCamera() {
+        this.mConfig = new Config();
+        mConfig.minPreviewWidth = 720;
+        mConfig.minPictureWidth = 720;
+        mConfig.rate = 1.778f;
+        sizeComparator = new CameraSizeComparator();
     }
 
     @Override
     public boolean open(int cameraId) {
-        mCamera=Camera.open(cameraId);
+        mCamera = Camera.open(cameraId);
 
-        if(mCamera!=null){
-            Camera.Parameters param=mCamera.getParameters();
-            picSize=getPropPictureSize(param.getSupportedPictureSizes(),mConfig.rate,
-                mConfig.minPictureWidth);
-            preSize=getPropPreviewSize(param.getSupportedPreviewSizes(),mConfig.rate,mConfig
-                .minPreviewWidth);
-            param.setPictureSize(picSize.width,picSize.height);
-            param.setPreviewSize(preSize.width,preSize.height);
+        if (mCamera != null) {
+            Camera.Parameters param = mCamera.getParameters();
+            picSize = getPropPictureSize(param.getSupportedPictureSizes(), mConfig.rate,
+                    mConfig.minPictureWidth);
+            preSize = getPropPreviewSize(param.getSupportedPreviewSizes(), mConfig.rate, mConfig
+                    .minPreviewWidth);
+            param.setPictureSize(picSize.width, picSize.height);
+            param.setPreviewSize(preSize.width, preSize.height);
+            param.setFocusMode(Camera.Parameters.FOCUS_MODE_CONTINUOUS_VIDEO);
             mCamera.setParameters(param);
-            Camera.Size pre=param.getPreviewSize();
-            Camera.Size pic=param.getPictureSize();
-            mPicSize=new Point(pic.height,pic.width);
-            mPreSize=new Point(pre.height,pre.width);
-            Log.e("wuwang","camera previewSize:"+mPreSize.x+"/"+mPreSize.y);
+            Camera.Size pre = param.getPreviewSize();
+            Camera.Size pic = param.getPictureSize();
+            mPicSize = new Point(pic.height, pic.width);
+            mPreSize = new Point(pre.height, pre.width);
+            Log.e("wuwang", "camera previewSize:" + mPreSize.x + "/" + mPreSize.y);
             return true;
         }
         return false;
     }
 
-    public void setPreviewTexture(SurfaceTexture texture){
-        if(mCamera!=null){
+    public void setPreviewTexture(SurfaceTexture texture) {
+        if (mCamera != null) {
             try {
                 mCamera.setPreviewTexture(texture);
             } catch (IOException e) {
@@ -75,12 +76,12 @@ public class KitkatCamera implements ICamera {
 
     @Override
     public void setConfig(Config config) {
-        this.mConfig=config;
+        this.mConfig = config;
     }
 
     @Override
     public boolean preview() {
-        if(mCamera!=null){
+        if (mCamera != null) {
             mCamera.startPreview();
         }
         return false;
@@ -101,11 +102,11 @@ public class KitkatCamera implements ICamera {
 
     @Override
     public boolean close() {
-        if(mCamera!=null){
-            try{
+        if (mCamera != null) {
+            try {
                 mCamera.stopPreview();
                 mCamera.release();
-            }catch (Exception e){
+            } catch (Exception e) {
                 e.printStackTrace();
             }
         }
@@ -124,74 +125,72 @@ public class KitkatCamera implements ICamera {
 
     @Override
     public void setOnPreviewFrameCallback(final PreviewFrameCallback callback) {
-        if(mCamera!=null){
+        if (mCamera != null) {
             mCamera.setPreviewCallback(new Camera.PreviewCallback() {
                 @Override
                 public void onPreviewFrame(byte[] data, Camera camera) {
-                    callback.onPreviewFrame(data,mPreSize.x,mPreSize.y);
+                    callback.onPreviewFrame(data, mPreSize.x, mPreSize.y);
                 }
             });
         }
     }
 
-    public void addBuffer(byte[] buffer){
-        if(mCamera!=null){
+    public void addBuffer(byte[] buffer) {
+        if (mCamera != null) {
             mCamera.addCallbackBuffer(buffer);
         }
     }
 
     public void setOnPreviewFrameCallbackWithBuffer(final PreviewFrameCallback callback) {
-        if(mCamera!=null){
-            Log.e("wuwang","Camera set CallbackWithBuffer");
+        if (mCamera != null) {
+            Log.e("wuwang", "Camera set CallbackWithBuffer");
             mCamera.setPreviewCallbackWithBuffer(new Camera.PreviewCallback() {
                 @Override
                 public void onPreviewFrame(byte[] data, Camera camera) {
-                    callback.onPreviewFrame(data,mPreSize.x,mPreSize.y);
+                    callback.onPreviewFrame(data, mPreSize.x, mPreSize.y);
                 }
             });
         }
     }
 
 
-    private Camera.Size getPropPreviewSize(List<Camera.Size> list, float th, int minWidth){
+    private Camera.Size getPropPreviewSize(List<Camera.Size> list, float th, int minWidth) {
         Collections.sort(list, sizeComparator);
 
         int i = 0;
-        for(Camera.Size s:list){
-            if((s.height >= minWidth) && equalRate(s, th)){
+        for (Camera.Size s : list) {
+            if ((s.height >= minWidth) && equalRate(s, th)) {
                 break;
             }
             i++;
         }
-        if(i == list.size()){
+        if (i == list.size()) {
             i = 0;
         }
         return list.get(i);
     }
 
-    private Camera.Size getPropPictureSize(List<Camera.Size> list, float th, int minWidth){
+    private Camera.Size getPropPictureSize(List<Camera.Size> list, float th, int minWidth) {
         Collections.sort(list, sizeComparator);
 
         int i = 0;
-        for(Camera.Size s:list){
-            if((s.height >= minWidth) && equalRate(s, th)){
+        for (Camera.Size s : list) {
+            if ((s.height >= minWidth) && equalRate(s, th)) {
                 break;
             }
             i++;
         }
-        if(i == list.size()){
+        if (i == list.size()) {
             i = 0;
         }
         return list.get(i);
     }
 
-    private boolean equalRate(Camera.Size s, float rate){
-        float r = (float)(s.width)/(float)(s.height);
-        if(Math.abs(r - rate) <= 0.03)
-        {
+    private boolean equalRate(Camera.Size s, float rate) {
+        float r = (float) (s.width) / (float) (s.height);
+        if (Math.abs(r - rate) <= 0.03) {
             return true;
-        }
-        else{
+        } else {
             return false;
         }
     }
@@ -199,13 +198,11 @@ public class KitkatCamera implements ICamera {
     private class CameraSizeComparator implements Comparator<Camera.Size> {
         public int compare(Camera.Size lhs, Camera.Size rhs) {
             // TODO Auto-generated method stub
-            if(lhs.height == rhs.height){
+            if (lhs.height == rhs.height) {
                 return 0;
-            }
-            else if(lhs.height > rhs.height){
+            } else if (lhs.height > rhs.height) {
                 return 1;
-            }
-            else{
+            } else {
                 return -1;
             }
         }

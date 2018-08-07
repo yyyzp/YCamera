@@ -8,6 +8,7 @@
 package com.opengl.opengltest;
 
 import android.content.res.Resources;
+import android.graphics.BitmapFactory;
 import android.graphics.SurfaceTexture;
 import android.opengl.GLES11Ext;
 import android.opengl.GLES20;
@@ -15,6 +16,7 @@ import android.opengl.GLSurfaceView;
 
 import com.opengl.opengltest.filter.AFilter;
 import com.opengl.opengltest.filter.OesFilter;
+import com.opengl.opengltest.filter.WaterMarkFilter;
 import com.opengl.opengltest.utils.Gl2Utils;
 
 import javax.microedition.khronos.egl.EGLConfig;
@@ -26,81 +28,92 @@ import javax.microedition.khronos.opengles.GL10;
  */
 public class CameraDrawer implements GLSurfaceView.Renderer {
 
-    private float[] matrix=new float[16];
+    private float[] matrix = new float[16];
     private SurfaceTexture surfaceTexture;
-    private int width,height;
-    private int dataWidth,dataHeight;
+    private int width, height;
+    private int dataWidth, dataHeight;
     private AFilter mOesFilter;
-    private int cameraId=1;
+    private WaterMarkFilter waterMarkFilter;
+    private int cameraId = 1;
 
-    public CameraDrawer(Resources res){
-        mOesFilter=new OesFilter(res);
+    public CameraDrawer(Resources res) {
+        mOesFilter = new OesFilter(res);
+        waterMarkFilter = new WaterMarkFilter(res);
+        waterMarkFilter.setWaterMark(BitmapFactory.decodeResource(res, R.mipmap.ic_launcher));
+        waterMarkFilter.setPosition(30, 50, 0, 0);
     }
-    public void setDataSize(int dataWidth,int dataHeight){
-        this.dataWidth=dataWidth;
-        this.dataHeight=dataHeight;
+
+    public void setDataSize(int dataWidth, int dataHeight) {
+        this.dataWidth = dataWidth;
+        this.dataHeight = dataHeight;
         calculateMatrix();
     }
 
-    public void setViewSize(int width,int height){
-        this.width=width;
-        this.height=height;
+    public void setViewSize(int width, int height) {
+        this.width = width;
+        this.height = height;
         calculateMatrix();
     }
 
-    private void calculateMatrix(){
-        Gl2Utils.getShowMatrix(matrix,this.dataWidth,this.dataHeight,this.width,this.height);
-        if(cameraId==1){
-            Gl2Utils.flip(matrix,true,false);
-            Gl2Utils.rotate(matrix,90);
-        }else{
-            Gl2Utils.rotate(matrix,270);
+    private void calculateMatrix() {
+        Gl2Utils.getShowMatrix(matrix, this.dataWidth, this.dataHeight, this.width, this.height);
+        if (cameraId == 1) {
+            Gl2Utils.flip(matrix, true, false);
+            Gl2Utils.rotate(matrix, 90);
+        } else {
+            Gl2Utils.rotate(matrix, 270);
         }
         mOesFilter.setMatrix(matrix);
+        waterMarkFilter.setMatrix(matrix);
     }
 
-    public SurfaceTexture getSurfaceTexture(){
+    public SurfaceTexture getSurfaceTexture() {
         return surfaceTexture;
     }
 
-    public void setCameraId(int id){
-        this.cameraId=id;
+    public void setCameraId(int id) {
+        this.cameraId = id;
         calculateMatrix();
     }
 
     @Override
     public void onSurfaceCreated(GL10 gl, EGLConfig config) {
         int texture = createTextureID();
-        surfaceTexture=new SurfaceTexture(texture);
+        surfaceTexture = new SurfaceTexture(texture);
         mOesFilter.create();
         mOesFilter.setTextureId(texture);
+        waterMarkFilter.create();
+
     }
 
     @Override
     public void onSurfaceChanged(GL10 gl, int width, int height) {
-        setViewSize(width,height);
+        setViewSize(width, height);
+        waterMarkFilter.setSize(width, height);
     }
 
     @Override
     public void onDrawFrame(GL10 gl) {
-        if(surfaceTexture!=null){
+        if (surfaceTexture != null) {
             surfaceTexture.updateTexImage();
         }
         mOesFilter.draw();
+        waterMarkFilter.draw();
+
     }
 
-    private int createTextureID(){
+    private int createTextureID() {
         int[] texture = new int[1];
         GLES20.glGenTextures(1, texture, 0);
         GLES20.glBindTexture(GLES11Ext.GL_TEXTURE_EXTERNAL_OES, texture[0]);
         GLES20.glTexParameterf(GLES11Ext.GL_TEXTURE_EXTERNAL_OES,
-            GL10.GL_TEXTURE_MIN_FILTER,GL10.GL_LINEAR);
+                GL10.GL_TEXTURE_MIN_FILTER, GL10.GL_LINEAR);
         GLES20.glTexParameterf(GLES11Ext.GL_TEXTURE_EXTERNAL_OES,
-            GL10.GL_TEXTURE_MAG_FILTER, GL10.GL_LINEAR);
+                GL10.GL_TEXTURE_MAG_FILTER, GL10.GL_LINEAR);
         GLES20.glTexParameteri(GLES11Ext.GL_TEXTURE_EXTERNAL_OES,
-            GL10.GL_TEXTURE_WRAP_S, GL10.GL_CLAMP_TO_EDGE);
+                GL10.GL_TEXTURE_WRAP_S, GL10.GL_CLAMP_TO_EDGE);
         GLES20.glTexParameteri(GLES11Ext.GL_TEXTURE_EXTERNAL_OES,
-            GL10.GL_TEXTURE_WRAP_T, GL10.GL_CLAMP_TO_EDGE);
+                GL10.GL_TEXTURE_WRAP_T, GL10.GL_CLAMP_TO_EDGE);
         return texture[0];
     }
 

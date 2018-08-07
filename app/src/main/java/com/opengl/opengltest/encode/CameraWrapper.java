@@ -49,8 +49,8 @@ public class CameraWrapper {
     private byte[] mImageCallbackBuffer = new byte[CameraWrapper.IMAGE_WIDTH
             * CameraWrapper.IMAGE_HEIGHT * 3 / 2];
     private boolean isBlur = false;
-    //    private int openCameraId = Camera.CameraInfo.CAMERA_FACING_BACK;
-    private int openCameraId = Camera.CameraInfo.CAMERA_FACING_FRONT;
+    private int openCameraId = Camera.CameraInfo.CAMERA_FACING_BACK;
+//    private int openCameraId = Camera.CameraInfo.CAMERA_FACING_FRONT;
 
     private CameraWrapper() {
     }

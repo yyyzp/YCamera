@@ -12,5 +12,12 @@
 
     </declare-styleable>
 
-
+    <declare-styleable name="BubbleLayout">
+        <attr name="bubble_strokeWidth" format="dimension" />
+        <attr name="bubble_cornerRadius" format="dimension" />
+        <attr name="bubble_bubbleWidth" format="dimension" />
+        <attr name="bubble_bubbleHeight" format="dimension" />
+        <attr name="bubble_bubbleHOffset" format="dimension" />
+        <attr name="bubble_color" format="color" />
+    </declare-styleable>
 </resources>

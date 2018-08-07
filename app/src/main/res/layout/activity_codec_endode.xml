@@ -9,8 +9,8 @@
   <!-- <com.opengl.opengltest.YSurfaceView
         android:id="@+id/surfaceview"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />-->
-
+        android:layout_height="match_parent" />
+-->
        <SurfaceView
         android:id="@+id/surfaceview"
         android:layout_width="match_parent"

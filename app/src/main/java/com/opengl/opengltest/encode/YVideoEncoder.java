@@ -31,7 +31,7 @@ public class YVideoEncoder extends Thread {
     public static final int BUFFER_OK = 0;
     public static final int BUFFER_TOO_SMALL = 1;
     public static final int OUTPUT_UPDATE = 2;
-    public boolean isEncoding;
+    public boolean isEncoding = true;
     public boolean isExit = false;
     // parameters for the encoder
     private static final String MIME_TYPE = "video/avc";    // H.264 Advanced Video Coding
@@ -110,6 +110,8 @@ public class YVideoEncoder extends Thread {
             mediaFormat.setInteger(MediaFormat.KEY_I_FRAME_INTERVAL, IFRAME_INTERVAL); //关键帧间隔时间 单位s
         }
         mediaCodec.configure(mediaFormat, null, null, MediaCodec.CONFIGURE_FLAG_ENCODE);
+        mediaCodec.start();
+
         mFrameData = new byte[this.WIDTH * this.HEIGHT * 3 / 2];
 
     }
@@ -117,18 +119,17 @@ public class YVideoEncoder extends Thread {
     /**
      * 开启编码器，获取输入输出缓冲区
      */
-    public void start() {
-        mediaCodec.start();
+//    public void start() {
+//        mediaCodec.start();
 //        try {
 //            mediaMuxer = new MediaMuxer(outputPath, MediaMuxer.OutputFormat.MUXER_OUTPUT_MPEG_4);
 //        } catch (IOException e) {
 //            e.printStackTrace();
 //        }
-        inputBuffers = mediaCodec.getInputBuffers();
+//        inputBuffers = mediaCodec.getInputBuffers();
 //        outputBuffers = mediaCodec.getOutputBuffers();
-        isEncoding = true;
-    }
-
+//        isEncoding = true;
+//    }
     public void add(byte[] data) {
 //        if (frameBytes != null && isMuxerReady) {
 //            frameBytes.add(data);
@@ -447,6 +448,7 @@ public class YVideoEncoder extends Thread {
             i420bytes[i + 1] = nv21bytes[i];
         }
     }
+
     public void exit() {
         isExit = true;
     }

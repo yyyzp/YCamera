@@ -44,15 +44,19 @@ public class WaterMarkFilter extends NoFilter{
         GLES20.glDisable(GLES20.GL_DEPTH_TEST);
         GLES20.glEnable(GLES20.GL_BLEND);
         GLES20.glBlendFunc(GLES20.GL_SRC_COLOR, GLES20.GL_DST_ALPHA);
-        mFilter.draw();
+//        onClear();
+        onUseProgram();
+        onBindTexture();
+        onDraw();
 //        GLES20.glDisable(GLES20.GL_BLEND);
     }
 
     @Override
     protected void onCreate() {
         super.onCreate();
-        mFilter.create();
+//        mFilter.create();
         createTexture();
+        setTextureType(1);
     }
     private int[] textures=new int[1];
     private void createTexture() {

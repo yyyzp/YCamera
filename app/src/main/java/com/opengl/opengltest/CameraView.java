@@ -64,6 +64,7 @@ public class CameraView extends GLSurfaceView implements GLSurfaceView.Renderer 
             }
         });
         mCamera2.preview();
+
     }
 
     public void switchCamera(){
@@ -94,4 +95,43 @@ public class CameraView extends GLSurfaceView implements GLSurfaceView.Renderer 
         super.onPause();
         mCamera2.close();
     }
+    public void startRecord() {
+        queueEvent(new Runnable() {
+            @Override
+            public void run() {
+                mCameraDrawer.startRecord();
+            }
+        });
+    }
+
+    public void stopRecord() {
+        queueEvent(new Runnable() {
+            @Override
+            public void run() {
+                mCameraDrawer.stopRecord();
+            }
+        });
+    }
+
+    public void resume(final boolean auto) {
+        queueEvent(new Runnable() {
+            @Override
+            public void run() {
+                mCameraDrawer.onResume(auto);
+            }
+        });
+    }
+
+    public void pause(final boolean auto) {
+        queueEvent(new Runnable() {
+            @Override
+            public void run() {
+                mCameraDrawer.onPause(auto);
+            }
+        });
+    }
+    public void setSavePath(String path) {
+        mCameraDrawer.setSavePath(path);
+    }
+
 }

@@ -127,4 +127,5 @@
 //    public void cameraHasOpened() {
 //        CameraWrapper.getInstance().doStartPreview(mSurfaceHolder);
 //    }
+//
 //}

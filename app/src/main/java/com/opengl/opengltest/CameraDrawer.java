@@ -12,6 +12,7 @@ import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;
 
 import com.opengl.opengltest.filter.AFilter;
+import com.opengl.opengltest.filter.Beauty;
 import com.opengl.opengltest.filter.OesFilter;
 import com.opengl.opengltest.filter.WaterMarkFilter;
 import com.opengl.opengltest.utils.Gl2Utils;
@@ -36,10 +37,10 @@ public class CameraDrawer implements GLSurfaceView.Renderer {
     private int dataWidth, dataHeight;
     private AFilter mOesFilter;
     private WaterMarkFilter waterMarkFilter;
+    private Beauty beautyFilter;
     private int cameraId = 1;
     private int mSignTexId;
     private int mTexId;
-
     private WaterSignature waterSignature;
     private FrameRect frameRect;
     private Resources mRes;
@@ -49,10 +50,11 @@ public class CameraDrawer implements GLSurfaceView.Renderer {
         waterSignature = new WaterSignature();
 //        frameRect=new FrameRect();
         mRes = res;
+//        beautyFilter=new Beauty(res);
         mOesFilter = new OesFilter(res);
-//        waterMarkFilter = new WaterMarkFilter(res);
-//        waterMarkFilter.setWaterMark(BitmapFactory.decodeResource(res, R.mipmap.fei));
-//        waterMarkFilter.setPosition(30, 50, 0, 0);
+        waterMarkFilter = new WaterMarkFilter(res);
+        waterMarkFilter.setWaterMark(BitmapFactory.decodeResource(res, R.mipmap.ic_launcher));
+        waterMarkFilter.setPosition(30, 50, 0, 0);
     }
 
     public void setDataSize(int dataWidth, int dataHeight) {
@@ -75,6 +77,7 @@ public class CameraDrawer implements GLSurfaceView.Renderer {
         } else {
             Gl2Utils.rotate(matrix, 270);
         }
+//        beautyFilter.setMatrix(matrix);
         mOesFilter.setMatrix(matrix);
 //        waterMarkFilter.setMatrix(matrix);
     }
@@ -97,9 +100,11 @@ public class CameraDrawer implements GLSurfaceView.Renderer {
 //        mTexId=texture;
         mOesFilter.create();
         mOesFilter.setTextureId(texture);
-        waterSignature.setShaderProgram(new WaterSignSProgram());
-        mSignTexId = TextureHelper.loadTexture(mRes, R.mipmap.fei);
-//        waterMarkFilter.create();
+//        beautyFilter.create();
+//        beautyFilter.setTextureId(texture);
+//        waterSignature.setShaderProgram(new WaterSignSProgram());
+//        mSignTexId = TextureHelper.loadTexture(mRes, R.mipmap.fei);
+        waterMarkFilter.create();
 
     }
 
@@ -113,21 +118,22 @@ public class CameraDrawer implements GLSurfaceView.Renderer {
         if (surfaceTexture != null) {
             surfaceTexture.updateTexImage();
         }
-//        onClear();
+        onClear();
 //        GLES20.glViewport(0, 0, width, height);
 //        frameRect.drawFrame(mTexId, mTmpMatrix);
 //        GLES20.glViewport(0, 0, 288, 144);
 //        waterSignature.drawFrame(mSignTexId);
-//        GLES20.glViewport(0, 0, width, height);
-        mOesFilter.draw();
-        GLES20.glViewport(0, 0, 288, 144);
-//        GLES20.glDisable(GLES20.GL_DEPTH_TEST);
-        GLES20.glEnable(GLES20.GL_BLEND);
-//        GLES20.glBlendFunc(GLES20.GL_SRC_COLOR, GLES20.GL_DST_ALPHA);
-        waterSignature.drawFrame(mSignTexId);
         GLES20.glViewport(0, 0, width, height);
-        GLES20.glDisable(GLES20.GL_BLEND);
-
+        mOesFilter.draw();
+//        beautyFilter.draw();
+//        GLES20.glViewport(0, 0, 288, 144);
+//        GLES20.glDisable(GLES20.GL_DEPTH_TEST);
+//        GLES20.glEnable(GLES20.GL_BLEND);
+//        GLES20.glBlendFunc(GLES20.GL_SRC_COLOR, GLES20.GL_DST_ALPHA);
+//        waterSignature.drawFrame(mSignTexId);
+//        GLES20.glViewport(0, 0, width, height);
+//        GLES20.glDisable(GLES20.GL_BLEND);
+        waterMarkFilter.draw();
 
 //        waterMarkFilter.draw();
 

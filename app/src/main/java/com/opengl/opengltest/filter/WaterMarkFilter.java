@@ -2,8 +2,10 @@ package com.opengl.opengltest.filter;
 
 import android.content.res.Resources;
 import android.graphics.Bitmap;
+import android.opengl.GLES11Ext;
 import android.opengl.GLES20;
 import android.opengl.GLUtils;
+import android.util.Log;
 
 import com.opengl.opengltest.utils.Gl2Utils;
 
@@ -12,24 +14,31 @@ import com.opengl.opengltest.utils.Gl2Utils;
  * 水印的Filter
  */
 
-public class WaterMarkFilter extends NoFilter{
+public class WaterMarkFilter extends AFilter{
     /**水印的放置位置和宽高*/
     private int x,y,w,h;
     /**控件的大小*/
     private int width,height;
     /**水印图片的bitmap*/
     private Bitmap mBitmap;
-    /***/
-    private NoFilter mFilter;
+    private float[] matrix = new float[16];
 
     public WaterMarkFilter(Resources mRes) {
         super(mRes);
-        mFilter=new NoFilter(mRes){
-            @Override
-            protected void onClear() {
-            }
-        };
+
     }
+    @Override
+    protected void onCreate() {
+        createProgramByAssetsFile("shader/base_vertex.sh",
+                "shader/base_fragment.sh");
+        createTexture();
+    }
+
+    @Override
+    protected void onSizeChanged(int width, int height) {
+
+    }
+
     public void setWaterMark(Bitmap bitmap){
         if(this.mBitmap!=null){
             this.mBitmap.recycle();
@@ -38,26 +47,14 @@ public class WaterMarkFilter extends NoFilter{
     }
     @Override
     public void draw() {
-//        GLES20.glViewport(0,0,width,height);
-//        super.draw();
         GLES20.glViewport(x,y,w == 0 ? mBitmap.getWidth():w,h==0?mBitmap.getHeight():h);
         GLES20.glDisable(GLES20.GL_DEPTH_TEST);
         GLES20.glEnable(GLES20.GL_BLEND);
         GLES20.glBlendFunc(GLES20.GL_SRC_COLOR, GLES20.GL_DST_ALPHA);
-//        onClear();
-        onUseProgram();
-        onBindTexture();
-        onDraw();
-//        GLES20.glDisable(GLES20.GL_BLEND);
+        GLES20.glDisable(GLES20.GL_BLEND);
+        super.draw();
     }
 
-    @Override
-    protected void onCreate() {
-        super.onCreate();
-//        mFilter.create();
-        createTexture();
-        setTextureType(1);
-    }
     private int[] textures=new int[1];
     private void createTexture() {
         if(mBitmap!=null){
@@ -74,19 +71,26 @@ public class WaterMarkFilter extends NoFilter{
             //设置环绕方向T，截取纹理坐标到[1/2n,1-1/2n]。将导致永远不会与border融合
             GLES20.glTexParameterf(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_T, GLES20.GL_CLAMP_TO_EDGE);
             GLUtils.texImage2D(GLES20.GL_TEXTURE_2D, 0, mBitmap, 0);
+//            matrix=Gl2Utils.getOriginalMatrix();
             //对画面进行矩阵旋转
-            Gl2Utils.flip(mFilter.getMatrix(),false,true);
-
-            mFilter.setTextureId(textures[0]);
+//            Gl2Utils.rotate(matrix, 180);
+//            setMatrix(matrix);
+            setTextureId(textures[0]);
         }
     }
-
+    /**
+     *
+     */
     @Override
-    protected void onSizeChanged(int width, int height) {
-        this.width=width;
-        this.height=height;
-        mFilter.setSize(width,height);
+    protected void onClear() {
+        Log.e("thread", "---onClear？ 1  "+Thread.currentThread());
+
+//        GLES20.glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+        Log.e("thread", "---onClear？ 2  "+Thread.currentThread());
+//        GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT | GLES20.GL_DEPTH_BUFFER_BIT);
+        Log.e("thread", "---onClear？ 3  ");
     }
+
     public void setPosition(int x,int y,int width,int height){
         this.x=x;
         this.y=y;

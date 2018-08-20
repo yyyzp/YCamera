@@ -1,6 +1,7 @@
+#extension GL_OES_EGL_image_external : require
 precision lowp float;
 precision lowp int;
-uniform sampler2D vTexture;
+uniform samplerExternalOES vTexture;
 uniform int iternum;
 uniform float aaCoef; //参数
 uniform float mixCoef; //混合系数

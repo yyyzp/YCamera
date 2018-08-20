@@ -11,14 +11,18 @@ import android.opengl.EGL14;
 import android.opengl.GLES11Ext;
 import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;
+import android.util.Log;
 
 import com.opengl.opengltest.filter.AFilter;
 import com.opengl.opengltest.filter.Beauty;
+import com.opengl.opengltest.filter.CameraFilter;
+import com.opengl.opengltest.filter.NoFilter;
 import com.opengl.opengltest.filter.OesFilter;
 import com.opengl.opengltest.filter.WaterMarkFilter;
 import com.opengl.opengltest.rencoder.video.TextureMovieEncoder;
 import com.opengl.opengltest.utils.EasyGlUtils;
 import com.opengl.opengltest.utils.Gl2Utils;
+import com.opengl.opengltest.utils.MatrixUtils;
 import com.opengl.opengltest.waterfiltercamera.FrameRect;
 import com.opengl.opengltest.waterfiltercamera.FrameRectSProgram;
 import com.opengl.opengltest.waterfiltercamera.TextureHelper;
@@ -34,32 +38,21 @@ import javax.microedition.khronos.opengles.GL10;
  */
 public class CameraDrawer implements GLSurfaceView.Renderer {
 
-    private float[] matrix = new float[16];
-    private SurfaceTexture surfaceTexture;
-    private int width, height;
-    private int dataWidth, dataHeight;
-    private AFilter mOesFilter;
-    private WaterMarkFilter waterMarkFilter;
-    private Beauty beautyFilter;
-    private int cameraId = 1;
-    private int mSignTexId;
-    private int mTexId;
-    private WaterSignature waterSignature;
-    private FrameRect frameRect;
-    private Resources mRes;
-    private final float[] mTmpMatrix = new float[16];
 
-    /**
-     * 创建离屏buffer
-     */
-    private int[] fFrame = new int[1];
-    private int[] fTexture = new int[2];
+    private final AFilter showFilter;
+    private final AFilter drawFilter;
+    private SurfaceTexture mSurfaceTextrue;
     /**
      * 预览数据的宽高
      */
     private int mPreviewWidth = 0, mPreviewHeight = 0;
+    /**
+     * 控件的宽高
+     */
+    private int width = 0, height = 0;
+
     private TextureMovieEncoder videoEncoder;
-    private boolean recordingEnabled;
+    private static volatile boolean recordingEnabled;
     private int recordingStatus;
     private static final int RECORDING_OFF = 0;
     private static final int RECORDING_ON = 1;
@@ -67,110 +60,74 @@ public class CameraDrawer implements GLSurfaceView.Renderer {
     private static final int RECORDING_PAUSE = 3;
     private static final int RECORDING_RESUME = 4;
     private static final int RECORDING_PAUSED = 5;
-    private String savePath;
+    private static volatile String savePath;
+    private int textureID;
+    private int[] fFrame = new int[1];
+    private int[] fTexture = new int[1];
+    private float[] OM;
 
-    public CameraDrawer(Resources res) {
-        waterSignature = new WaterSignature();
-//        frameRect=new FrameRect();
-        mRes = res;
-//        beautyFilter=new Beauty(res);
-        mOesFilter = new OesFilter(res);
-        waterMarkFilter = new WaterMarkFilter(res);
-        waterMarkFilter.setWaterMark(BitmapFactory.decodeResource(res, R.mipmap.ic_launcher));
-        waterMarkFilter.setPosition(30, 50, 0, 0);
-    }
 
-    public void setDataSize(int dataWidth, int dataHeight) {
-        this.dataWidth = dataWidth;
-        this.dataHeight = dataHeight;
-        calculateMatrix();
-    }
+    public CameraDrawer(Resources resources) {
+        //初始化一个滤镜 也可以叫控制器
+        showFilter = new CameraFilter(resources);
+        drawFilter = new CameraFilter(resources);
 
-    public void setViewSize(int width, int height) {
-        this.width = width;
-        this.height = height;
-        mPreviewWidth = width;
-        mPreviewHeight = height;
-        calculateMatrix();
-    }
+        /**因为屏幕的坐标系和录制的坐标系不同 所以录制的filter 需要加上坐标系旋转*/
+        OM = MatrixUtils.getOriginalMatrix();
+        MatrixUtils.flip(OM, false, true);//矩阵上下翻转
+        drawFilter.setMatrix(OM);
 
-    private void calculateMatrix() {
-        Gl2Utils.getShowMatrix(matrix, this.dataWidth, this.dataHeight, this.width, this.height);
-        if (cameraId == 1) {
-            Gl2Utils.flip(matrix, true, false);
-            Gl2Utils.rotate(matrix, 90);
-        } else {
-            Gl2Utils.rotate(matrix, 270);
-        }
-//        beautyFilter.setMatrix(matrix);
-        mOesFilter.setMatrix(matrix);
-//        waterMarkFilter.setMatrix(matrix);
-    }
-
-    public SurfaceTexture getSurfaceTexture() {
-        return surfaceTexture;
-    }
-
-    public void setCameraId(int id) {
-        this.cameraId = id;
-        calculateMatrix();
+         recordingEnabled = false;
     }
 
     @Override
-    public void onSurfaceCreated(GL10 gl, EGLConfig config) {
-//        frameRect.setShaderProgram(new FrameRectSProgram());
+    public void onSurfaceCreated(GL10 gl10, EGLConfig eglConfig) {
+        textureID = createTextureID();
+        mSurfaceTextrue = new SurfaceTexture(textureID);
+        showFilter.create();
+        showFilter.setTextureId(textureID);
+        drawFilter.create();
 
-        int texture = createTextureID();
-        surfaceTexture = new SurfaceTexture(texture);
-//        mTexId=texture;
-        mOesFilter.create();
-        mOesFilter.setTextureId(texture);
-        waterMarkFilter.create();
-        if (recordingEnabled){
+
+        if (recordingEnabled) {
             recordingStatus = RECORDING_RESUMED;
-        } else{
+        } else {
             recordingStatus = RECORDING_OFF;
         }
-//        beautyFilter.create();
-//        beautyFilter.setTextureId(texture);
-//        waterSignature.setShaderProgram(new WaterSignSProgram());
-//        mSignTexId = TextureHelper.loadTexture(mRes, R.mipmap.fei);
+    }
 
+
+    @Override
+    public void onSurfaceChanged(GL10 gl10, int i, int i1) {
+        width = i;
+        height = i1;
+        /**创建一个帧染缓冲区对象*/
+        GLES20.glGenFramebuffers(1, fFrame, 0);
+        /**根据纹理数量 返回的纹理索引*/
+        GLES20.glGenTextures(1, fTexture, 0);
+        /**将生产的纹理名称和对应纹理进行绑定*/
+        GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, fTexture[0]);
+        /**根据指定的参数 生产一个2D的纹理 调用该函数前  必须调用glBindTexture以指定要操作的纹理*/
+        GLES20.glTexImage2D(GLES20.GL_TEXTURE_2D, 0, GLES20.GL_RGBA, mPreviewWidth, mPreviewHeight,
+                0, GLES20.GL_RGBA, GLES20.GL_UNSIGNED_BYTE, null);
+        useTexParameter();
+        GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, 0);
     }
 
     @Override
-    public void onSurfaceChanged(GL10 gl, int width, int height) {
-        setViewSize(width, height);
-//        GLES20.glDeleteFramebuffers(1, fFrame, 0);
-//        GLES20.glDeleteTextures(1, fTexture, 0);
-//        GLES20.glGenFramebuffers(1, fFrame, 0);
-//        EasyGlUtils.genTexturesWithParameter(1, fTexture, 0, GLES20.GL_RGBA, width, height);
-    }
+    public void onDrawFrame(GL10 gl10) {
+        /**更新界面中的数据*/
+        mSurfaceTextrue.updateTexImage();
 
-    @Override
-    public void onDrawFrame(GL10 gl) {
-        if (surfaceTexture != null) {
-            surfaceTexture.updateTexImage();
-        }
-        onClear();
-//        GLES20.glViewport(0, 0, width, height);
-//        frameRect.drawFrame(mTexId, mTmpMatrix);
-//        GLES20.glViewport(0, 0, 288, 144);
-//        waterSignature.drawFrame(mSignTexId);
-//        EasyGlUtils.bindFrameTexture(fFrame[0], fTexture[0]);
-        GLES20.glViewport(0, 0, width, height);
+        GLES20.glBindFramebuffer(GLES20.GL_FRAMEBUFFER, fFrame[0]);
+        GLES20.glFramebufferTexture2D(GLES20.GL_FRAMEBUFFER, GLES20.GL_COLOR_ATTACHMENT0,
+                GLES20.GL_TEXTURE_2D, fTexture[0], 0);
+        GLES20.glViewport(0, 0, mPreviewWidth, mPreviewHeight);
+        drawFilter.setTextureId(fTexture[0]);
+        drawFilter.draw();
+        //解绑
+        GLES20.glBindFramebuffer(GLES20.GL_FRAMEBUFFER, 0);
 
-        mOesFilter.draw();
-//        beautyFilter.draw();
-//        GLES20.glViewport(0, 0, 288, 144);
-//        EasyGlUtils.bindFrameTexture(fFrame[0], fTexture[1]);
-//        GLES20.glDisable(GLES20.GL_DEPTH_TEST);
-//        GLES20.glEnable(GLES20.GL_BLEND);
-//        GLES20.glBlendFunc(GLES20.GL_SRC_COLOR, GLES20.GL_DST_ALPHA);
-//        waterSignature.drawFrame(mSignTexId);
-//        GLES20.glViewport(0, 0, width, height);
-//        GLES20.glDisable(GLES20.GL_BLEND);
-        waterMarkFilter.draw();
         if (recordingEnabled) {
             /**说明是录制状态*/
             switch (recordingStatus) {
@@ -183,24 +140,24 @@ public class CameraDrawer implements GLSurfaceView.Renderer {
                             null));
                     recordingStatus = RECORDING_ON;
                     break;
+                case RECORDING_ON:
+                case RECORDING_PAUSE:
+                    break;
                 case RECORDING_RESUMED:
                     videoEncoder.updateSharedContext(EGL14.eglGetCurrentContext());
                     videoEncoder.resumeRecording();
                     recordingStatus = RECORDING_ON;
-                    break;
-                case RECORDING_ON:
-                case RECORDING_PAUSED:
-                    break;
-                case RECORDING_PAUSE:
-                    videoEncoder.pauseRecording();
-                    recordingStatus = RECORDING_PAUSED;
                     break;
 
                 case RECORDING_RESUME:
                     videoEncoder.resumeRecording();
                     recordingStatus = RECORDING_ON;
                     break;
+                case RECORDING_PAUSED:
+                    videoEncoder.pauseRecording();
+                    recordingStatus = RECORDING_PAUSED;
 
+                    break;
                 default:
                     throw new RuntimeException("unknown recording status " + recordingStatus);
             }
@@ -223,13 +180,83 @@ public class CameraDrawer implements GLSurfaceView.Renderer {
         }
 
         if (videoEncoder != null && recordingEnabled && recordingStatus == RECORDING_ON) {
-            videoEncoder.setTextureId(mOesFilter.getOutputTexture());
-            videoEncoder.frameAvailable(surfaceTexture);
+            videoEncoder.setTextureId(fTexture[0]);
+            videoEncoder.frameAvailable(mSurfaceTextrue);
         }
-
+        /**绘制显示的filter*/
+        GLES20.glViewport(0, 0, width, height);
+        showFilter.draw();
 
     }
 
+    /**
+     * 设置预览效果的size
+     */
+    public void setPreviewSize(int width, int height) {
+        if (mPreviewWidth != width || mPreviewHeight != height) {
+            mPreviewWidth = width;
+            mPreviewHeight = height;
+        }
+        Log.e("hero", "--setPreviewSize-==" + width + "---" + height);
+    }
+
+    public void setViewSize(int width, int height) {
+        this.width = width;
+        this.height = height;
+    }
+
+    //根据摄像头设置纹理映射坐标
+    public void setCameraId(int id) {
+        showFilter.setFlag(id);
+        drawFilter.setFlag(id);
+    }
+
+    public void startRecord() {
+        Log.d("thread", android.os.Process.myPid()+"   start");
+        recordingEnabled = true;
+    }
+
+    public void stopRecord() {
+        Log.d("thread", android.os.Process.myPid()+"   stop");
+        recordingEnabled = false;
+    }
+
+    public void setSavePath(String path) {
+        this.savePath = path;
+    }
+
+    public SurfaceTexture getTexture() {
+        return mSurfaceTextrue;
+    }
+
+    public void onPause(boolean auto) {
+        if (auto) {
+            videoEncoder.pauseRecording();
+            if (recordingStatus == RECORDING_ON) {
+                recordingStatus = RECORDING_PAUSED;
+            }
+            return;
+        }
+        if (recordingStatus == RECORDING_ON) {
+            recordingStatus = RECORDING_PAUSE;
+        }
+    }
+
+    public void onResume(boolean auto) {
+        if (auto) {
+            if (recordingStatus == RECORDING_PAUSED) {
+                recordingStatus = RECORDING_RESUME;
+            }
+            return;
+        }
+        if (recordingStatus == RECORDING_PAUSED) {
+            recordingStatus = RECORDING_RESUME;
+        }
+    }
+
+    /**
+     * 创建显示的texture
+     */
     private int createTextureID() {
         int[] texture = new int[1];
         GLES20.glGenTextures(1, texture, 0);
@@ -245,47 +272,19 @@ public class CameraDrawer implements GLSurfaceView.Renderer {
         return texture[0];
     }
 
-    /**
-     * 清除画布
-     */
-    protected void onClear() {
-        GLES20.glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
-        GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT | GLES20.GL_DEPTH_BUFFER_BIT);
-    }
-    public void startRecord() {
-        recordingEnabled=true;
-    }
-
-    public void stopRecord() {
-        recordingEnabled=false;
-    }
-    public void setSavePath(String path) {
-        this.savePath=path;
+    public void useTexParameter() {
+        //设置缩小过滤为使用纹理中坐标最接近的一个像素的颜色作为需要绘制的像素颜色
+        GLES20.glTexParameterf(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MIN_FILTER, GLES20.GL_NEAREST);
+        //设置放大过滤为使用纹理中坐标最接近的若干个颜色，通过加权平均算法得到需要绘制的像素颜色
+        GLES20.glTexParameterf(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MAG_FILTER, GLES20.GL_LINEAR);
+        //设置环绕方向S，截取纹理坐标到[1/2n,1-1/2n]。将导致永远不会与border融合
+        GLES20.glTexParameterf(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_S, GLES20.GL_CLAMP_TO_EDGE);
+        //设置环绕方向T，截取纹理坐标到[1/2n,1-1/2n]。将导致永远不会与border融合
+        GLES20.glTexParameterf(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_T, GLES20.GL_CLAMP_TO_EDGE);
     }
 
-    public void onPause(boolean auto) {
-        if(auto){
-            videoEncoder.pauseRecording();
-            if(recordingStatus==RECORDING_ON){
-                recordingStatus=RECORDING_PAUSED;
-            }
-            return;
-        }
-        if(recordingStatus==RECORDING_ON){
-            recordingStatus=RECORDING_PAUSE;
-        }
-    }
-
-    public void onResume(boolean auto) {
-        if(auto){
-            if(recordingStatus==RECORDING_PAUSED){
-                recordingStatus=RECORDING_RESUME;
-            }
-            return;
-        }
-        if(recordingStatus==RECORDING_PAUSED){
-            recordingStatus=RECORDING_RESUME;
-        }
+    public SurfaceTexture getSurfaceTexture() {
+        return mSurfaceTextrue;
     }
 
 }

@@ -55,7 +55,8 @@ public class CameraView extends GLSurfaceView implements GLSurfaceView.Renderer 
         mCamera2.open(cameraId);
         mCameraDrawer.setCameraId(cameraId);
         Point point=mCamera2.getPreviewSize();
-        mCameraDrawer.setDataSize(point.x,point.y);
+        mCameraDrawer.setPreviewSize(point.x,point.y);
+//        mCameraDrawer.setDataSize(point.x,point.y);
         mCamera2.setPreviewTexture(mCameraDrawer.getSurfaceTexture());
         mCameraDrawer.getSurfaceTexture().setOnFrameAvailableListener(new SurfaceTexture.OnFrameAvailableListener() {
             @Override
@@ -81,8 +82,7 @@ public class CameraView extends GLSurfaceView implements GLSurfaceView.Renderer 
 
     @Override
     public void onSurfaceChanged(GL10 gl, int width, int height) {
-        mCameraDrawer.setViewSize(width,height);
-        GLES20.glViewport(0,0,width,height);
+        mCameraDrawer.onSurfaceChanged(gl, width, height);
     }
 
     @Override

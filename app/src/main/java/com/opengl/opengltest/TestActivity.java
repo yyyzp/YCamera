@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.annotation.Nullable;
+import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
@@ -14,6 +15,7 @@ import android.widget.Toast;
 import com.opengl.opengltest.encode.CameraWrapper;
 import com.opengl.opengltest.encode.YVideoEncoder;
 import com.opengl.opengltest.rencoder.MediaMuxerRunnable;
+import com.opengl.opengltest.utils.Constants;
 import com.opengl.opengltest.utils.FileSwapHelper;
 import com.opengl.opengltest.widget.CircularProgressView;
 
@@ -35,10 +37,11 @@ public class TestActivity extends Activity implements View.OnClickListener {
     private boolean autoPausing = false;
     long timeCount = 0;//用于记录录制时间
     private long timeStep = 50;//进度条刷新的时间
-    private static final int maxTime = 20000;//最长录制20s
+    private static final int maxTime = 10000;//最长录制20s
     ExecutorService executorService;
     File file;
-    String mPath=Environment.getExternalStorageDirectory().getAbsolutePath()+"/aaaaaaaaaaa.mp4";
+    String mPath = Environment.getExternalStorageDirectory().getAbsolutePath() + "/aaaaaaaaaaa.mp4";
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -47,8 +50,8 @@ public class TestActivity extends Activity implements View.OnClickListener {
         mCameraView = new CameraView(this);
         mCapture = findViewById(R.id.mCapture);
         mCapture.setOnClickListener(this);
-        file=new File(mPath);
-        if(file.exists()){
+        file = new File(mPath);
+        if (file.exists()) {
             file.delete();
         }
         try {
@@ -76,6 +79,7 @@ public class TestActivity extends Activity implements View.OnClickListener {
                 break;
         }
     }
+
     Runnable recordRunnable = new Runnable() {
         @Override
         public void run() {
@@ -84,21 +88,25 @@ public class TestActivity extends Activity implements View.OnClickListener {
             autoPausing = false;
             timeCount = 0;
             long time = System.currentTimeMillis();
-            String savePath = mPath;
+            String savePath = Constants.getPath("record/", time + ".mp4");
 
             try {
                 mCameraView.setSavePath(savePath);
                 mCameraView.startRecord();
+                Log.d("yzp", "start");
                 while (timeCount <= maxTime && recordFlag) {
                     if (pausing || autoPausing) {
                         continue;
                     }
-                    mCapture.setProcess((int) timeCount);
+                    mCapture.setProcess((int) timeCount / 100);
+                    Log.d("yzp", timeCount + "   " + maxTime + "  " + recordFlag);
                     Thread.sleep(timeStep);
                     timeCount += timeStep;
                 }
                 recordFlag = false;
                 mCameraView.stopRecord();
+                Log.d("yzp", "stop");
+
                 if (timeCount < 2000) {
                     runOnUiThread(new Runnable() {
                         @Override
@@ -115,6 +123,7 @@ public class TestActivity extends Activity implements View.OnClickListener {
             }
         }
     };
+
     private void recordComplete(final String path) {
         runOnUiThread(new Runnable() {
             @Override

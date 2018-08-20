@@ -46,10 +46,11 @@ public class TestActivity extends Activity implements View.OnClickListener {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_test);
-        executorService = Executors.newSingleThreadExecutor();
-        mCameraView = new CameraView(this);
+//        mCameraView = new CameraView(this);
+        mCameraView = findViewById(R.id.camera_view);
         mCapture = findViewById(R.id.mCapture);
         mCapture.setOnClickListener(this);
+        executorService = Executors.newSingleThreadExecutor();
         file = new File(mPath);
         if (file.exists()) {
             file.delete();

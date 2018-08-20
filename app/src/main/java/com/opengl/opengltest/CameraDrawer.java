@@ -52,7 +52,7 @@ public class CameraDrawer implements GLSurfaceView.Renderer {
     private int width = 0, height = 0;
 
     private TextureMovieEncoder videoEncoder;
-    private static volatile boolean recordingEnabled;
+    private boolean recordingEnabled;
     private int recordingStatus;
     private static final int RECORDING_OFF = 0;
     private static final int RECORDING_ON = 1;
@@ -60,7 +60,9 @@ public class CameraDrawer implements GLSurfaceView.Renderer {
     private static final int RECORDING_PAUSE = 3;
     private static final int RECORDING_RESUME = 4;
     private static final int RECORDING_PAUSED = 5;
-    private static volatile String savePath;
+    private String savePath;
+    private static volatile String pA = "AAAAAAA";
+    private String pB = "BBBBBB";
     private int textureID;
     private int[] fFrame = new int[1];
     private int[] fTexture = new int[1];
@@ -77,7 +79,7 @@ public class CameraDrawer implements GLSurfaceView.Renderer {
         MatrixUtils.flip(OM, false, true);//矩阵上下翻转
         drawFilter.setMatrix(OM);
 
-         recordingEnabled = false;
+        recordingEnabled = false;
     }
 
     @Override
@@ -118,7 +120,9 @@ public class CameraDrawer implements GLSurfaceView.Renderer {
     public void onDrawFrame(GL10 gl10) {
         /**更新界面中的数据*/
         mSurfaceTextrue.updateTexImage();
-
+        Log.d("yzp", pA);
+        Log.d("yzp", pB);
+        Log.d("yzp", recordingEnabled + "");
         GLES20.glBindFramebuffer(GLES20.GL_FRAMEBUFFER, fFrame[0]);
         GLES20.glFramebufferTexture2D(GLES20.GL_FRAMEBUFFER, GLES20.GL_COLOR_ATTACHMENT0,
                 GLES20.GL_TEXTURE_2D, fTexture[0], 0);
@@ -212,17 +216,17 @@ public class CameraDrawer implements GLSurfaceView.Renderer {
     }
 
     public void startRecord() {
-        Log.d("thread", android.os.Process.myPid()+"   start");
+        Log.d("thread", android.os.Process.myPid() + "   start");
         recordingEnabled = true;
     }
 
     public void stopRecord() {
-        Log.d("thread", android.os.Process.myPid()+"   stop");
+        Log.d("thread", android.os.Process.myPid() + "   stop");
         recordingEnabled = false;
     }
 
     public void setSavePath(String path) {
-        this.savePath = path;
+        savePath = path;
     }
 
     public SurfaceTexture getTexture() {

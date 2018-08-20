@@ -41,6 +41,7 @@ public class CameraView extends GLSurfaceView implements GLSurfaceView.Renderer 
         setEGLContextClientVersion(2);
         setRenderer(this);
         setRenderMode(RENDERMODE_WHEN_DIRTY);
+        setPreserveEGLContextOnPause(true);//保存Context当pause时
         mCamera2=new KitkatCamera();
         mCameraDrawer=new CameraDrawer(getResources());
     }

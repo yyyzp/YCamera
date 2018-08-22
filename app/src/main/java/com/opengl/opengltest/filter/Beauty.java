@@ -15,9 +15,11 @@ public class Beauty extends AFilter {
     private int gHiternum;
     private int gHWidth;
     private int gHHeight;
+    private int gHopacity;
 
     private float aaCoef;
     private float mixCoef;
+    private float opacity;
     private int iternum;
 
     private int mWidth=720;
@@ -27,16 +29,18 @@ public class Beauty extends AFilter {
     public Beauty(Resources res) {
         super(res);
         setFlag(5);
+        setSmoothOpacity(Float.valueOf("0.5"));
     }
 
     @Override
     protected void onCreate() {
-        createProgramByAssetsFile("shader/beauty/beauty.vert", "shader/beauty/beauty.frag");
+        createProgramByAssetsFile("shader/beauty/beauty.vert", "shader/beauty/beauty2.frag");
         gHaaCoef= GLES20.glGetUniformLocation(mProgram,"aaCoef");
         gHmixCoef=GLES20.glGetUniformLocation(mProgram,"mixCoef");
         gHiternum=GLES20.glGetUniformLocation(mProgram,"iternum");
         gHWidth=GLES20.glGetUniformLocation(mProgram,"mWidth");
         gHHeight=GLES20.glGetUniformLocation(mProgram,"mHeight");
+        gHopacity=GLES20.glGetUniformLocation(mProgram,"opacity");
     }
 
     @Override
@@ -87,6 +91,7 @@ public class Beauty extends AFilter {
         GLES20.glUniform1f(gHaaCoef,aaCoef);
         GLES20.glUniform1f(gHmixCoef,mixCoef);
         GLES20.glUniform1i(gHiternum,iternum);
+        GLES20.glUniform1f(gHopacity,opacity);
     }
 
     @Override
@@ -95,4 +100,32 @@ public class Beauty extends AFilter {
         GLES20.glBindTexture(GLES11Ext.GL_TEXTURE_EXTERNAL_OES,getTextureId());
         GLES20.glUniform1i(mHTexture,getTextureType());
     }
+    /**
+     * 设置磨皮程度
+     * @param percent 百分比
+     */
+    public void setSmoothOpacity(float percent) {
+        float opacity;
+        if (percent <= 0) {
+            opacity = 0.0f;
+        } else {
+            opacity = calculateOpacity(percent);
+        }
+       this.opacity=opacity;
+    }
+
+    /**
+     * 根据百分比计算出实际的磨皮程度
+     * @param percent
+     * @return
+     */
+    private float calculateOpacity(float percent) {
+        float result = 0.0f;
+
+        // TODO 可以加入分段函数，对不同等级的磨皮进行不一样的处理
+        result = (float) (1.0f - (1.0f - percent + 0.02) / 2.0f);
+
+        return result;
+    }
+
 }

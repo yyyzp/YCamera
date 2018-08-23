@@ -8,11 +8,56 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         />
+
+    <LinearLayout
+        android:id="@+id/ll_beauty"
+        android:layout_alignParentBottom="true"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+
+        >
+        <Button
+            android:id="@+id/btn_1"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:text="beauty-level-1"
+            />
+        <Button
+            android:id="@+id/btn_2"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:text="beauty-level-2"
+            />
+        <Button
+            android:id="@+id/btn_3"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:text="beauty-level-3"
+            />
+        <Button
+            android:id="@+id/btn_4"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:text="beauty-level-4"
+            />
+        <Button
+            android:id="@+id/btn_5"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:text="beauty-level-5"
+            />
+    </LinearLayout>
     <com.opengl.opengltest.widget.CircularProgressView
         android:id="@+id/mCapture"
         android:layout_width="88dp"
         android:layout_height="88dp"
-        android:layout_alignParentBottom="true"
+        android:layout_above="@id/ll_beauty"
         android:layout_centerHorizontal="true"
         android:background="@drawable/bt_capture"
         android:clickable="true" />

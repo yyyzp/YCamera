@@ -59,7 +59,7 @@ public class CameraDrawer implements GLSurfaceView.Renderer {
     /*
     * 相机预览 美颜滤镜
     */
-    private final Beauty beautyFilter;
+    private  Beauty beautyFilter;
 
     //    private final AFilter showFilter;
 //    private final AFilter drawFilter;
@@ -90,9 +90,10 @@ public class CameraDrawer implements GLSurfaceView.Renderer {
     private int[] fTexture = new int[1];
     private float[] OM;
     private float[] SM = new float[16];     //用于显示的变换矩阵
-
+    private Resources res;
 
     public CameraDrawer(Resources resources) {
+        this.res=resources;
         //初始化一个滤镜 也可以叫控制器
         showFilter = new NoFilter(resources);
 //        drawFilter = new CameraFilter(resources);
@@ -213,8 +214,6 @@ public class CameraDrawer implements GLSurfaceView.Renderer {
             }
         }
 
-        /**绘制显示的filter*/
-        GLES20.glViewport(0, 0, width, height);
         if (videoEncoder != null && recordingEnabled && recordingStatus == RECORDING_ON) {
             videoEncoder.setTextureId(fTexture[0]);
             videoEncoder.frameAvailable(mSurfaceTextrue);
@@ -260,6 +259,13 @@ public class CameraDrawer implements GLSurfaceView.Renderer {
 
     public void setSavePath(String path) {
         savePath = path;
+    }
+    public void setBeautyLevel(int level){
+        beautyFilter=new Beauty(res);
+        beautyFilter.setSmoothOpacity(level);
+        beautyFilter.setMatrix(OM);
+        beautyFilter.create();
+        beautyFilter.setTextureId(textureID);
     }
 
     private void addFilter(AFilter filter) {

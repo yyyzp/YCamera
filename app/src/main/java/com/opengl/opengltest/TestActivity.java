@@ -32,6 +32,11 @@ import java.util.concurrent.Executors;
 public class TestActivity extends Activity implements View.OnClickListener {
     CircularProgressView mCapture;
     CameraView mCameraView;
+    Button btn_level_1;
+    Button btn_level_2;
+    Button btn_level_3;
+    Button btn_level_4;
+    Button btn_level_5;
     private boolean recordFlag = false;//是否正在录制
     private boolean pausing = false;
     private boolean autoPausing = false;
@@ -49,7 +54,17 @@ public class TestActivity extends Activity implements View.OnClickListener {
 //        mCameraView = new CameraView(this);
         mCameraView = findViewById(R.id.camera_view);
         mCapture = findViewById(R.id.mCapture);
+        btn_level_1 = findViewById(R.id.btn_1);
+        btn_level_2 = findViewById(R.id.btn_2);
+        btn_level_3 = findViewById(R.id.btn_3);
+        btn_level_4 = findViewById(R.id.btn_4);
+        btn_level_5 = findViewById(R.id.btn_5);
         mCapture.setOnClickListener(this);
+        btn_level_1.setOnClickListener(this);
+        btn_level_2.setOnClickListener(this);
+        btn_level_3.setOnClickListener(this);
+        btn_level_4.setOnClickListener(this);
+        btn_level_5.setOnClickListener(this);
         executorService = Executors.newSingleThreadExecutor();
         file = new File(mPath);
         if (file.exists()) {
@@ -75,6 +90,21 @@ public class TestActivity extends Activity implements View.OnClickListener {
                     mCameraView.resume(false);
                     pausing = false;
                 }
+                break;
+            case R.id.btn_1:
+                mCameraView.setBeautyLevel(1);
+                break;
+            case R.id.btn_2:
+                mCameraView.setBeautyLevel(2);
+                break;
+            case R.id.btn_3:
+                mCameraView.setBeautyLevel(3);
+                break;
+            case R.id.btn_4:
+                mCameraView.setBeautyLevel(4);
+                break;
+            case R.id.btn_5:
+                mCameraView.setBeautyLevel(5);
                 break;
             default:
                 break;

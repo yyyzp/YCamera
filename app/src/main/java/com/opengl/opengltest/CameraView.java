@@ -134,5 +134,8 @@ public class CameraView extends GLSurfaceView implements GLSurfaceView.Renderer 
     public void setSavePath(String path) {
         mCameraDrawer.setSavePath(path);
     }
+    public void setBeautyLevel(int level){
+        mCameraDrawer.setBeautyLevel(level);
+    }
 
 }

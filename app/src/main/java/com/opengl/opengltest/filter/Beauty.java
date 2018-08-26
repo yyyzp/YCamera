@@ -28,8 +28,7 @@ public class Beauty extends AFilter {
 
     public Beauty(Resources res) {
         super(res);
-        setFlag(5);
-        setSmoothOpacity(Float.valueOf("0.5"));
+//        setFlag(5);
     }
 
     @Override
@@ -69,6 +68,26 @@ public class Beauty extends AFilter {
                 a(0, 0f, 0f);
                 break;
         }
+
+        float[] coord;
+        if (getFlag() == 1) {    //前置摄像头 顺时针旋转90,并上下颠倒
+            coord = new float[]{
+                    1.0f, 1.0f,
+                    0.0f, 1.0f,
+                    1.0f, 0.0f,
+                    0.0f, 0.0f,
+            };
+        } else {               //后置摄像头 顺时针旋转90度
+            coord = new float[]{
+                    0.0f, 1.0f,
+                    1.0f, 1.0f,
+                    0.0f, 0.0f,
+                    1.0f, 0.0f,
+            };
+        }
+        mTexBuffer.clear();
+        mTexBuffer.put(coord);
+        mTexBuffer.position(0);
     }
 
     private void a(int a, float b, float c) {
@@ -114,6 +133,8 @@ public class Beauty extends AFilter {
             opacity = calculateOpacity(percent);
         }
         this.opacity = opacity;
+        GLES20.glUniform1f(gHopacity, opacity);
+
     }
 
     /**
@@ -139,6 +160,7 @@ public class Beauty extends AFilter {
                 this.opacity = Float.valueOf("0.9");
                 break;
         }
+        GLES20.glUniform1f(gHopacity, opacity);
     }
 
     /**

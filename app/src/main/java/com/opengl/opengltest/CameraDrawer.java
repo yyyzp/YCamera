@@ -91,6 +91,16 @@ public class CameraDrawer implements GLSurfaceView.Renderer {
     private float[] OM;
     private float[] SM = new float[16];     //用于显示的变换矩阵
     private Resources res;
+    /**
+     * 切换摄像头的时候
+     * 会出现画面颠倒的情况
+     * 通过跳帧来解决
+     * */
+    boolean switchCamera=false;
+    int skipFrame;
+    public void switchCamera() {
+        switchCamera=true;
+    }
 
     public CameraDrawer(Resources resources) {
         this.res=resources;
@@ -99,10 +109,10 @@ public class CameraDrawer implements GLSurfaceView.Renderer {
 //        drawFilter = new CameraFilter(resources);
         beautyFilter = new Beauty(resources);
 
-        OM = MatrixUtils.getOriginalMatrix();
-        Gl2Utils.flip(OM, true, false);
-        Gl2Utils.rotate(OM, 90);
-        beautyFilter.setMatrix(OM);
+//        OM = MatrixUtils.getOriginalMatrix();
+//        Gl2Utils.flip(OM, true, false);
+//        Gl2Utils.rotate(OM, 90);
+//        beautyFilter.setMatrix(OM);
 //        drawFilter.setMatrix(OM);
         waterMarkFilter = new WaterMarkFilter(resources);
         waterMarkFilter.setWaterMark(BitmapFactory.decodeResource(resources, R.mipmap.fei));
@@ -163,6 +173,15 @@ public class CameraDrawer implements GLSurfaceView.Renderer {
     public void onDrawFrame(GL10 gl10) {
         /**更新界面中的数据*/
         mSurfaceTextrue.updateTexImage();
+        //切换摄像头时跳两帧
+        if(switchCamera){
+            skipFrame++;
+            if(skipFrame>1){
+                skipFrame=0;
+                switchCamera=false;
+            }
+            return;
+        }
         GLES20.glBindFramebuffer(GLES20.GL_FRAMEBUFFER, fFrame[0]);
         GLES20.glViewport(0, 0, mPreviewWidth, mPreviewHeight);
 //        drawFilter.draw();
@@ -242,7 +261,7 @@ public class CameraDrawer implements GLSurfaceView.Renderer {
 
     //根据摄像头设置纹理映射坐标
     public void setCameraId(int id) {
-        showFilter.setFlag(id);
+        beautyFilter.setFlag(id);
 //        drawFilter.setFlag(id);
 //        beautyFilter.setFlag(id);
     }
@@ -261,11 +280,7 @@ public class CameraDrawer implements GLSurfaceView.Renderer {
         savePath = path;
     }
     public void setBeautyLevel(int level){
-        beautyFilter=new Beauty(res);
-        beautyFilter.setSmoothOpacity(level);
-        beautyFilter.setMatrix(OM);
-        beautyFilter.create();
-        beautyFilter.setTextureId(textureID);
+        beautyFilter.setBeautyLevel(level);
     }
 
     private void addFilter(AFilter filter) {

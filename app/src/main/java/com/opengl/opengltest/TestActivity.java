@@ -37,6 +37,7 @@ public class TestActivity extends Activity implements View.OnClickListener {
     Button btn_level_3;
     Button btn_level_4;
     Button btn_level_5;
+    Button btn_change_camera;
     private boolean recordFlag = false;//是否正在录制
     private boolean pausing = false;
     private boolean autoPausing = false;
@@ -59,12 +60,14 @@ public class TestActivity extends Activity implements View.OnClickListener {
         btn_level_3 = findViewById(R.id.btn_3);
         btn_level_4 = findViewById(R.id.btn_4);
         btn_level_5 = findViewById(R.id.btn_5);
+        btn_change_camera = findViewById(R.id.btn_change_camera);
         mCapture.setOnClickListener(this);
         btn_level_1.setOnClickListener(this);
         btn_level_2.setOnClickListener(this);
         btn_level_3.setOnClickListener(this);
         btn_level_4.setOnClickListener(this);
         btn_level_5.setOnClickListener(this);
+        btn_change_camera.setOnClickListener(this);
         executorService = Executors.newSingleThreadExecutor();
         file = new File(mPath);
         if (file.exists()) {
@@ -105,6 +108,9 @@ public class TestActivity extends Activity implements View.OnClickListener {
                 break;
             case R.id.btn_5:
                 mCameraView.setBeautyLevel(5);
+                break;
+            case R.id.btn_change_camera:
+                mCameraView.switchCamera();
                 break;
             default:
                 break;

@@ -55,10 +55,20 @@
     </LinearLayout>
     <com.opengl.opengltest.widget.CircularProgressView
         android:id="@+id/mCapture"
-        android:layout_width="88dp"
-        android:layout_height="88dp"
+        android:layout_width="70dp"
+        android:layout_height="70dp"
         android:layout_above="@id/ll_beauty"
         android:layout_centerHorizontal="true"
         android:background="@drawable/bt_capture"
         android:clickable="true" />
+    <Button
+        android:id="@+id/btn_change_camera"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="change"
+        android:layout_toRightOf="@+id/mCapture"
+        android:layout_marginLeft="10dp"
+        android:layout_above="@+id/ll_beauty"
+
+        />
 </RelativeLayout>

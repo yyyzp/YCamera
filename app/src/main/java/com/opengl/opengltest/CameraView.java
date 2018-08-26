@@ -24,12 +24,12 @@ public class CameraView extends GLSurfaceView implements GLSurfaceView.Renderer 
 
     private KitkatCamera mCamera2;
     private CameraDrawer mCameraDrawer;
-    private int cameraId=0;
+    private int cameraId = 0;
 
     private Runnable mRunnable;
 
     public CameraView(Context context) {
-        this(context,null);
+        this(context, null);
     }
 
     public CameraView(Context context, AttributeSet attrs) {
@@ -37,26 +37,26 @@ public class CameraView extends GLSurfaceView implements GLSurfaceView.Renderer 
         init();
     }
 
-    private void init(){
+    private void init() {
         setEGLContextClientVersion(2);
         setRenderer(this);
         setRenderMode(RENDERMODE_WHEN_DIRTY);
         setPreserveEGLContextOnPause(true);//保存Context当pause时
-        mCamera2=new KitkatCamera();
-        mCameraDrawer=new CameraDrawer(getResources());
+        mCamera2 = new KitkatCamera();
+        mCameraDrawer = new CameraDrawer(getResources());
     }
 
     @Override
     public void onSurfaceCreated(GL10 gl, EGLConfig config) {
-        mCameraDrawer.onSurfaceCreated(gl,config);
-        if(mRunnable!=null){
+        mCameraDrawer.onSurfaceCreated(gl, config);
+        if (mRunnable != null) {
             mRunnable.run();
-            mRunnable=null;
+            mRunnable = null;
         }
         mCamera2.open(cameraId);
         mCameraDrawer.setCameraId(cameraId);
-        Point point=mCamera2.getPreviewSize();
-        mCameraDrawer.setPreviewSize(point.x,point.y);
+        Point point = mCamera2.getPreviewSize();
+        mCameraDrawer.setPreviewSize(point.x, point.y);
 //        mCameraDrawer.setDataSize(point.x,point.y);
         mCamera2.setPreviewTexture(mCameraDrawer.getSurfaceTexture());
         mCameraDrawer.getSurfaceTexture().setOnFrameAvailableListener(new SurfaceTexture.OnFrameAvailableListener() {
@@ -69,16 +69,20 @@ public class CameraView extends GLSurfaceView implements GLSurfaceView.Renderer 
 
     }
 
-    public void switchCamera(){
-        mRunnable=new Runnable() {
-            @Override
-            public void run() {
-                mCamera2.close();
-                cameraId=cameraId==1?0:1;
-            }
-        };
-        onPause();
-        onResume();
+    private void open(int cameraId) {
+        mCamera2.close();
+        mCamera2.open(cameraId);
+        mCameraDrawer.setCameraId(cameraId);
+        Point point = mCamera2.getPreviewSize();
+        mCameraDrawer.setPreviewSize(point.x, point.y);
+        mCamera2.setPreviewTexture(mCameraDrawer.getSurfaceTexture());
+        mCamera2.preview();
+    }
+
+    public void switchCamera() {
+        cameraId = cameraId == 0 ? 1 : 0;
+        mCameraDrawer.switchCamera();
+        open(cameraId);
     }
 
     @Override
@@ -96,6 +100,7 @@ public class CameraView extends GLSurfaceView implements GLSurfaceView.Renderer 
         super.onPause();
         mCamera2.close();
     }
+
     public void startRecord() {
         queueEvent(new Runnable() {
             @Override
@@ -131,10 +136,12 @@ public class CameraView extends GLSurfaceView implements GLSurfaceView.Renderer 
             }
         });
     }
+
     public void setSavePath(String path) {
         mCameraDrawer.setSavePath(path);
     }
-    public void setBeautyLevel(int level){
+
+    public void setBeautyLevel(int level) {
         mCameraDrawer.setBeautyLevel(level);
     }
 

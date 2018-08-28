@@ -255,10 +255,9 @@ public class CameraDrawer implements GLSurfaceView.Renderer {
 
     private void calculateMatrix(int cameraId) {
         OM = MatrixUtils.getOriginalMatrix();
-//        Gl2Utils.flip(OM, true, false);
         //后置摄像头 需要顺时针旋转90度并左右翻转
         if (cameraId == 0) {
-//            Gl2Utils.flip(OM, true, false);
+            Gl2Utils.flip(OM, true, false);
             Gl2Utils.rotate(OM, 90);
         } else {
             //前置摄像头需要顺时针旋转270度

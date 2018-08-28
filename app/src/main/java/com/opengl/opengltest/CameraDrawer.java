@@ -59,7 +59,7 @@ public class CameraDrawer implements GLSurfaceView.Renderer {
     /*
     * 相机预览 美颜滤镜
     */
-    private  Beauty beautyFilter;
+    private Beauty beautyFilter;
 
     //    private final AFilter showFilter;
 //    private final AFilter drawFilter;
@@ -95,24 +95,22 @@ public class CameraDrawer implements GLSurfaceView.Renderer {
      * 切换摄像头的时候
      * 会出现画面颠倒的情况
      * 通过跳帧来解决
-     * */
-    boolean switchCamera=false;
+     */
+    boolean switchCamera = false;
     int skipFrame;
+
     public void switchCamera() {
-        switchCamera=true;
+        switchCamera = true;
     }
 
     public CameraDrawer(Resources resources) {
-        this.res=resources;
+        this.res = resources;
         //初始化一个滤镜 也可以叫控制器
         showFilter = new NoFilter(resources);
 //        drawFilter = new CameraFilter(resources);
         beautyFilter = new Beauty(resources);
 
-//        OM = MatrixUtils.getOriginalMatrix();
-//        Gl2Utils.flip(OM, true, false);
-//        Gl2Utils.rotate(OM, 90);
-//        beautyFilter.setMatrix(OM);
+
 //        drawFilter.setMatrix(OM);
         waterMarkFilter = new WaterMarkFilter(resources);
         waterMarkFilter.setWaterMark(BitmapFactory.decodeResource(resources, R.mipmap.fei));
@@ -174,11 +172,11 @@ public class CameraDrawer implements GLSurfaceView.Renderer {
         /**更新界面中的数据*/
         mSurfaceTextrue.updateTexImage();
         //切换摄像头时跳两帧
-        if(switchCamera){
+        if (switchCamera) {
             skipFrame++;
-            if(skipFrame>1){
-                skipFrame=0;
-                switchCamera=false;
+            if (skipFrame > 1) {
+                skipFrame = 0;
+                switchCamera = false;
             }
             return;
         }
@@ -254,14 +252,25 @@ public class CameraDrawer implements GLSurfaceView.Renderer {
         Log.e("hero", "--setPreviewSize-==" + width + "---" + height);
     }
 
-    public void setViewSize(int width, int height) {
-        this.width = width;
-        this.height = height;
+
+    private void calculateMatrix(int cameraId) {
+        OM = MatrixUtils.getOriginalMatrix();
+//        Gl2Utils.flip(OM, true, false);
+        //后置摄像头 需要顺时针旋转90度并左右翻转
+        if (cameraId == 0) {
+//            Gl2Utils.flip(OM, true, false);
+            Gl2Utils.rotate(OM, 90);
+        } else {
+            //前置摄像头需要顺时针旋转270度
+            Gl2Utils.rotate(OM, 270);
+        }
+        beautyFilter.setMatrix(OM);
+//        waterMarkFilter.setMatrix(matrix);
     }
 
     //根据摄像头设置纹理映射坐标
     public void setCameraId(int id) {
-        beautyFilter.setFlag(id);
+        calculateMatrix(id);
 //        drawFilter.setFlag(id);
 //        beautyFilter.setFlag(id);
     }
@@ -279,7 +288,8 @@ public class CameraDrawer implements GLSurfaceView.Renderer {
     public void setSavePath(String path) {
         savePath = path;
     }
-    public void setBeautyLevel(int level){
+
+    public void setBeautyLevel(int level) {
         beautyFilter.setBeautyLevel(level);
     }
 

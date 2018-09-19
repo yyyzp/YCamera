@@ -267,7 +267,7 @@ public class CameraDrawer implements GLSurfaceView.Renderer {
             //前置摄像头需要顺时针旋转270度
             Gl2Utils.rotate(OM, 270);
         }
-//        beautyFilter.setMatrix(OM);
+        beautyFilter.setMatrix(OM);
         douyinFilter.setMatrix(OM);
 //        waterMarkFilter.setMatrix(matrix);
     }
@@ -275,8 +275,6 @@ public class CameraDrawer implements GLSurfaceView.Renderer {
     //根据摄像头设置纹理映射坐标
     public void setCameraId(int id) {
         calculateMatrix(id);
-//        drawFilter.setFlag(id);
-//        beautyFilter.setFlag(id);
     }
 
     public void startRecord() {

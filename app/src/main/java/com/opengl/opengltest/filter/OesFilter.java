@@ -19,6 +19,7 @@ import java.util.Arrays;
 public class OesFilter extends AFilter{
 
     private int mHCoordMatrix;
+    private int mScale;
     private float[] mCoordMatrix= Arrays.copyOf(OM,16);
 
     public OesFilter(Resources mRes) {
@@ -27,8 +28,9 @@ public class OesFilter extends AFilter{
 
     @Override
     protected void onCreate() {
-        createProgramByAssetsFile("shader/oes_base_vertex.sh","filter/douyin.sh");
+        createProgramByAssetsFile("shader/oes_base_vertex.sh","filter/douyindoudong_fragment.sh");
         mHCoordMatrix=GLES20.glGetUniformLocation(mProgram,"vCoordMatrix");
+        mScale=GLES20.glGetUniformLocation(mProgram,"scale");
     }
 
     public void setCoordMatrix(float[] matrix){
@@ -39,6 +41,8 @@ public class OesFilter extends AFilter{
     protected void onSetExpandData() {
         super.onSetExpandData();
         GLES20.glUniformMatrix4fv(mHCoordMatrix,1,false,mCoordMatrix,0);
+        GLES20.glUniform1f(mScale,1.50f);
+
     }
 
     @Override

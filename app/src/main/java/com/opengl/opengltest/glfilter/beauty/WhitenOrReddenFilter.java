@@ -2,6 +2,8 @@ package com.opengl.opengltest.glfilter.beauty;
 
 import android.opengl.GLES30;
 
+import com.opengl.opengltest.glfilter.base.GLImageFilter;
+
 
 /**
  * 处理画面白皙还是红润

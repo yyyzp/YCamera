@@ -65,11 +65,11 @@ public class DouYin1 extends AFilter {
 
         GLES20.glActiveTexture(GLES20.GL_TEXTURE1);
         GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, textures[1]);
-        GLES20.glUniform1i(mHTexture[1], textures[1]);
+        GLES20.glUniform1i(mHTexture[1], 1);
 
         GLES20.glActiveTexture(GLES20.GL_TEXTURE2);
         GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, textures[2]);
-        GLES20.glUniform1i(mHTexture[2], textures[2]);
+        GLES20.glUniform1i(mHTexture[2], 2);
     }
 
 

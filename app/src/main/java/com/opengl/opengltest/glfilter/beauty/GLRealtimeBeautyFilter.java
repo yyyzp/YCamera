@@ -2,6 +2,8 @@ package com.opengl.opengltest.glfilter.beauty;
 
 import android.opengl.GLES30;
 
+import com.opengl.opengltest.glfilter.base.GLImageFilter;
+
 
 /**
  * 实时磨皮滤镜

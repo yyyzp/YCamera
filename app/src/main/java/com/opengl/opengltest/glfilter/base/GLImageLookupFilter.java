@@ -2,6 +2,8 @@ package com.opengl.opengltest.glfilter.base;
 
 import android.opengl.GLES30;
 
+import com.opengl.opengltest.utils.GlUtil;
+
 
 /**
  * 应用查找表(LUT)滤镜

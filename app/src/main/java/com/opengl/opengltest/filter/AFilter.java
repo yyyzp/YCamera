@@ -140,11 +140,11 @@ public abstract class AFilter {
         return textureType;
     }
 
-    public final int getTextureId(){
+    public  int getTextureId(){
         return textureId;
     }
 
-    public final void setTextureId(int textureId){
+    public  void setTextureId(int textureId){
         this.textureId=textureId;
     }
 

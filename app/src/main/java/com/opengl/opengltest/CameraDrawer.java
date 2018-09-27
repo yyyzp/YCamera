@@ -18,6 +18,7 @@ import android.util.Log;
 import com.opengl.opengltest.filter.AFilter;
 import com.opengl.opengltest.filter.Beauty;
 import com.opengl.opengltest.filter.CameraFilter;
+import com.opengl.opengltest.filter.DouYin1;
 import com.opengl.opengltest.filter.GroupFilter;
 import com.opengl.opengltest.filter.NoFilter;
 import com.opengl.opengltest.filter.OesFilter;
@@ -51,7 +52,12 @@ public class CameraDrawer implements GLSurfaceView.Renderer {
      * 显示画面的filter
      */
     private final AFilter showFilter;
-    private  OesFilter douyinFilter;
+    /**
+     * 后台绘制的filter
+     */
+    private final AFilter drawFilter;
+    private OesFilter douyinFilter;
+    private DouYin1 douYin1;
     /**
      * 后台绘制的filter
      */
@@ -108,11 +114,10 @@ public class CameraDrawer implements GLSurfaceView.Renderer {
         this.res = resources;
         //初始化一个滤镜 也可以叫控制器
         showFilter = new NoFilter(resources);
-//        drawFilter = new CameraFilter(resources);
+        drawFilter = new CameraFilter(resources);
         beautyFilter = new Beauty(resources);
-
-        douyinFilter=new OesFilter(resources);
-//        drawFilter.setMatrix(OM);
+        douYin1=new DouYin1(resources);
+        douyinFilter = new OesFilter(resources);
         waterMarkFilter = new WaterMarkFilter(resources);
         waterMarkFilter.setWaterMark(BitmapFactory.decodeResource(resources, R.mipmap.fei));
         waterMarkFilter.setPosition(30, 50, 100, 100);
@@ -126,15 +131,17 @@ public class CameraDrawer implements GLSurfaceView.Renderer {
     public void onSurfaceCreated(GL10 gl10, EGLConfig eglConfig) {
         textureID = createTextureID();
         mSurfaceTextrue = new SurfaceTexture(textureID);
-        douyinFilter.create();
-        douyinFilter.setTextureId(textureID);
+        drawFilter.create();
+        drawFilter.setTextureId(textureID);
+//        douyinFilter.create();
+//        douyinFilter.setTextureId(textureID);
 //        beautyFilter.create();
 //        beautyFilter.setTextureId(textureID);
-//        drawFilter.create();
-//        drawFilter.setTextureId(textureID);
-
+//        douYin1.create();
+//        douYin1.setTextureId(textureID);
         showFilter.create();
         waterMarkFilter.create();
+
 
         if (recordingEnabled) {
             recordingStatus = RECORDING_RESUMED;
@@ -185,9 +192,10 @@ public class CameraDrawer implements GLSurfaceView.Renderer {
         }
         GLES20.glBindFramebuffer(GLES20.GL_FRAMEBUFFER, fFrame[0]);
         GLES20.glViewport(0, 0, mPreviewWidth, mPreviewHeight);
-//        drawFilter.draw();
+        drawFilter.draw();
 //        beautyFilter.draw();
-        douyinFilter.draw();
+//        douyinFilter.draw();
+//        douYin1.draw();
         waterMarkFilter.draw();
         GLES20.glBindFramebuffer(GLES20.GL_FRAMEBUFFER, 0);
 
@@ -267,6 +275,7 @@ public class CameraDrawer implements GLSurfaceView.Renderer {
             //前置摄像头需要顺时针旋转270度
             Gl2Utils.rotate(OM, 270);
         }
+        drawFilter.setMatrix(OM);
         beautyFilter.setMatrix(OM);
         douyinFilter.setMatrix(OM);
 //        waterMarkFilter.setMatrix(matrix);

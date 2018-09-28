@@ -64,7 +64,9 @@ public class GLImageEffectIllusionFilter extends GLImageFilter {
     private int mLookupTableHandle;
     private int mLastTexture;
     private int mLookupTable;
-
+    public GLImageEffectIllusionFilter() {
+        this(null, VERTEX_SHADER, FRAGMENT_SHADER);
+    }
     public GLImageEffectIllusionFilter(Context context) {
         this(context, VERTEX_SHADER, FRAGMENT_SHADER);
     }

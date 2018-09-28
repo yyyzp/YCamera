@@ -38,7 +38,7 @@ public class CameraView extends GLSurfaceView implements GLSurfaceView.Renderer 
     }
 
     private void init() {
-        setEGLContextClientVersion(2);
+        setEGLContextClientVersion(3);
         setRenderer(this);
         setRenderMode(RENDERMODE_WHEN_DIRTY);
         setPreserveEGLContextOnPause(true);//保存Context当pause时

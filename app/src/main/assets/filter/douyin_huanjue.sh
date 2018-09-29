@@ -1,7 +1,7 @@
 #extension GL_OES_EGL_image_external : require
 precision mediump float;
 varying vec2 textureCoordinate;
-uniform samplerExternalOES inputTexture;     // 当前输入纹理
+uniform sampler2D inputTexture;     // 当前输入纹理
 uniform sampler2D inputTextureLast; // 上一次的纹理
 uniform sampler2D lookupTable;      // 颜色查找表纹理
 

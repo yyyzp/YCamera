@@ -126,15 +126,15 @@ public class CameraDrawer implements GLSurfaceView.Renderer {
 //        waterMarkFilter.setWaterMark(BitmapFactory.decodeResource(resources, R.mipmap.fei));
 //        waterMarkFilter.setPosition(30, 50, 100, 100);
 //        addFilter(waterMarkFilter);
-        glImageEffectIllusionFilter=new GLImageEffectIllusionFilter();
         glImageOESInputFilter=new GLImageOESInputFilter();
+        glImageEffectIllusionFilter=new GLImageEffectIllusionFilter();
         displayFilter=new GLImageFilter();
         recordingEnabled = false;
     }
 
     @Override
     public void onSurfaceCreated(GL10 gl10, EGLConfig eglConfig) {
-        textureID = createTextureID();
+//        textureID = createTextureID();
         textureID =createTexture(GLES11Ext.GL_TEXTURE_EXTERNAL_OES);
         mSurfaceTextrue = new SurfaceTexture(textureID);
 //        drawFilter.create();

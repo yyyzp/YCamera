@@ -36,9 +36,17 @@ public class DouYin1 extends AFilter {
         mHTexture[0] = GLES20.glGetUniformLocation(mProgram, "inputTexture");
         mHTexture[1] = GLES20.glGetUniformLocation(mProgram, "inputTextureLast");
         mHTexture[2] = GLES20.glGetUniformLocation(mProgram, "lookupTable");
-        createTexture();
+//        createTexture();
     }
-
+    protected void onDraw(){
+        GLES20.glEnableVertexAttribArray(mHPosition);
+        GLES20.glVertexAttribPointer(mHPosition,2, GLES20.GL_FLOAT, false, 0,mVerBuffer);
+        GLES20.glEnableVertexAttribArray(mHCoord);
+        GLES20.glVertexAttribPointer(mHCoord, 2, GLES20.GL_FLOAT, false, 0, mTexBuffer);
+        GLES20.glDrawArrays(GLES20.GL_TRIANGLE_STRIP,0,4);
+        GLES20.glDisableVertexAttribArray(mHPosition);
+        GLES20.glDisableVertexAttribArray(mHCoord);
+    }
     private void a(int a, float b, float c) {
         this.iternum = a;
         this.aaCoef = b;
@@ -60,8 +68,8 @@ public class DouYin1 extends AFilter {
     @Override
     protected void onBindTexture() {
         GLES20.glActiveTexture(GLES20.GL_TEXTURE0);
-        GLES20.glBindTexture(GLES11Ext.GL_TEXTURE_EXTERNAL_OES, getTextureId());
-        GLES20.glUniform1i(mHTexture[0], textures[0]);
+        GLES20.glBindTexture(GLES20.GL_TEXTURE_2D,getTextureId());
+        GLES20.glUniform1i(mHTexture[0],0);
 
         GLES20.glActiveTexture(GLES20.GL_TEXTURE1);
         GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, textures[1]);

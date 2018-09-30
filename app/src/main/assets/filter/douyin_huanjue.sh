@@ -1,7 +1,6 @@
-#extension GL_OES_EGL_image_external : require
 precision mediump float;
 varying vec2 textureCoordinate;
-uniform sampler2D inputTexture;     // 当前输入纹理
+uniform sampler2D vTexture;     // 当前输入纹理
 uniform sampler2D inputTextureLast; // 上一次的纹理
 uniform sampler2D lookupTable;      // 颜色查找表纹理
 
@@ -38,12 +37,14 @@ vec4 getLutColor(vec4 textureColor, sampler2D lookupTexture) {
 
 void main() {
     // 当前纹理颜色
-    vec4 currentColor = texture2D(inputTexture, textureCoordinate);
+    vec4 currentColor = texture2D(vTexture, textureCoordinate);
     // 上一轮纹理颜色
     vec4 lastColor = texture2D(inputTextureLast, textureCoordinate);
     // lut映射的颜色值
     vec4 lutColor = getLutColor(currentColor, lookupTable);
     // 将lut映射之后的纹理与上一轮的纹理进行线性混合
-    gl_FragColor = vec4(mix(lastColor.rgb, lutColor.rgb, blend), currentColor.a);
+   //gl_FragColor = vec4(mix(lastColor.rgb, lutColor.rgb, blendValue), currentColor.a);
+     gl_FragColor = vec4(0.95 * lastColor.r  +  0.05* lutColor.r,lutColor.g * 0.2 + lastColor.g * 0.8, lutColor.b,1.0);
+
 }
 

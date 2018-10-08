@@ -43,8 +43,8 @@ void main() {
     // lut映射的颜色值
     vec4 lutColor = getLutColor(currentColor, lookupTable);
     // 将lut映射之后的纹理与上一轮的纹理进行线性混合
-   //gl_FragColor = vec4(mix(lastColor.rgb, lutColor.rgb, blendValue), currentColor.a);
-     gl_FragColor = vec4(0.95 * lastColor.r  +  0.05* lutColor.r,lutColor.g * 0.2 + lastColor.g * 0.8, lutColor.b,1.0);
+   // gl_FragColor = vec4(mix(lastColor.rgb, lutColor.rgb, blendValue), currentColor.a);
+    gl_FragColor = vec4(0.95 * lastColor.r  +  0.05* lutColor.r,lutColor.g * 0.2 + lastColor.g * 0.8, lutColor.b,1.0);
 
 }
 

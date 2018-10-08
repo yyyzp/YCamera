@@ -42,6 +42,7 @@ public class CameraDrawer implements GLSurfaceView.Renderer {
      * 后台绘制的filter
      */
     private final AFilter drawFilter;
+    private final AFilter drawLastTextureFilter;
     private DouyinHuanjue douyinHuanjue;
 
     private final WaterMarkFilter waterMarkFilter;
@@ -72,8 +73,8 @@ public class CameraDrawer implements GLSurfaceView.Renderer {
     private static final int RECORDING_PAUSED = 5;
     private String savePath;
     private int textureID;
-    private int[] fFrame = new int[2];
-    private int[] fTexture = new int[2];
+    private int[] fFrame = new int[3];
+    private int[] fTexture = new int[3];
     private float[] OM;
     private float[] SM = new float[16];     //用于显示的变换矩阵
     private Resources res;
@@ -93,6 +94,7 @@ public class CameraDrawer implements GLSurfaceView.Renderer {
         this.res = resources;
         //初始化一个滤镜 也可以叫控制器
         showFilter = new NoFilter(resources);
+        drawLastTextureFilter=new NoFilter(resources);
         drawFilter = new CameraFilter(resources);
 //        beautyFilter = new Beauty(resources);
         douyinHuanjue = new DouyinHuanjue(resources);
@@ -111,6 +113,7 @@ public class CameraDrawer implements GLSurfaceView.Renderer {
         mSurfaceTextrue = new SurfaceTexture(textureID);
         drawFilter.create();
         drawFilter.setTextureId(textureID);
+        drawLastTextureFilter.create();
 //        douyinFilter.create();
 //        douyinFilter.setTextureId(textureID);
 //        beautyFilter.create();
@@ -133,12 +136,12 @@ public class CameraDrawer implements GLSurfaceView.Renderer {
         width = i;
         height = i1;
         //清除遗留的
-        GLES20.glDeleteFramebuffers(2, fFrame, 0);
-        GLES20.glDeleteTextures(2, fTexture, 0);
+        GLES20.glDeleteFramebuffers(3, fFrame, 0);
+        GLES20.glDeleteTextures(3, fTexture, 0);
         /**创建一个帧染缓冲区对象*/
-        GLES20.glGenFramebuffers(2, fFrame, 0);
+        GLES20.glGenFramebuffers(3, fFrame, 0);
         /**根据纹理数量 返回的纹理索引*/
-        GLES20.glGenTextures(2, fTexture, 0);
+        GLES20.glGenTextures(3, fTexture, 0);
        /* GLES20.glRenderbufferStorage(GLES20.GL_RENDERBUFFER, GLES20.GL_DEPTH_COMPONENT16, width,
                 height);*/
         /**将生产的纹理名称和对应纹理进行绑定*/
@@ -162,6 +165,16 @@ public class CameraDrawer implements GLSurfaceView.Renderer {
         GLES20.glFramebufferTexture2D(GLES20.GL_FRAMEBUFFER, GLES20.GL_COLOR_ATTACHMENT0,
                 GLES20.GL_TEXTURE_2D, fTexture[1], 0);
 
+        /**将生产的纹理名称和对应纹理进行绑定*/
+        GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, fTexture[2]);
+        /**根据指定的参数 生产一个2D的纹理 调用该函数前  必须调用glBindTexture以指定要操作的纹理*/
+        GLES20.glTexImage2D(GLES20.GL_TEXTURE_2D, 0, GLES20.GL_RGBA, mPreviewWidth, mPreviewHeight,
+                0, GLES20.GL_RGBA, GLES20.GL_UNSIGNED_BYTE, null);
+        useTexParameter();
+        GLES20.glBindFramebuffer(GLES20.GL_FRAMEBUFFER, fFrame[2]);
+        GLES20.glFramebufferTexture2D(GLES20.GL_FRAMEBUFFER, GLES20.GL_COLOR_ATTACHMENT0,
+                GLES20.GL_TEXTURE_2D, fTexture[2], 0);
+
         GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, 0);
         GLES20.glBindFramebuffer(GLES20.GL_FRAMEBUFFER, 0);
     }
@@ -179,7 +192,7 @@ public class CameraDrawer implements GLSurfaceView.Renderer {
             }
             return;
         }
-
+        //cameraFilter（相机原始数据） 将oes filter 画到帧缓存0中
         GLES20.glBindFramebuffer(GLES20.GL_FRAMEBUFFER, fFrame[0]);
         GLES20.glViewport(0, 0, mPreviewWidth, mPreviewHeight);
         drawFilter.draw();
@@ -239,22 +252,31 @@ public class CameraDrawer implements GLSurfaceView.Renderer {
             videoEncoder.frameAvailable(mSurfaceTextrue);
         }
 
+
+
+        //设置上一帧的纹理 即取出帧缓存2中的纹理数据
+        douyinHuanjue.setLastTexture(fTexture[2]);
+
         /**绘制幻觉的filter*/
+        //将帧缓存0的纹理应用到幻觉filter 绘制到屏幕
         GLES20.glViewport(0, 0, width, height);
         douyinHuanjue.setTextureId(fTexture[0]);
         douyinHuanjue.draw();
-//        douyinHuanjue.setLastTexture(fTexture[0]);
-        /**绘制显示的filter*/
-//        GLES20.glViewport(0, 0, width, height);
-//        showFilter.setTextureId(fTexture[0]);
-//        showFilter.draw();
 
-
+        //将帧缓存0的纹理应用到幻觉filter 绘制到帧缓存1中 这里是为了获得上一帧的纹理数据
         GLES20.glBindFramebuffer(GLES20.GL_FRAMEBUFFER, fFrame[1]);
         GLES20.glViewport(0, 0, mPreviewWidth, mPreviewHeight);
+        douyinHuanjue.setTextureId(fTexture[0]);
         douyinHuanjue.draw();
         GLES20.glBindFramebuffer(GLES20.GL_FRAMEBUFFER, 0);
-        douyinHuanjue.setLastTexture(fTexture[1]);
+
+        //将帧缓存1的纹理应用到drawLastTextureFilter 绘制到帧缓存2中 作为上一帧的纹理设置给幻觉filter 这个步骤是必须的 否则达不到效果
+        GLES20.glBindFramebuffer(GLES20.GL_FRAMEBUFFER, fFrame[2]);
+        GLES20.glViewport(0, 0, mPreviewWidth, mPreviewHeight);
+        drawLastTextureFilter.setTextureId(fTexture[1]);
+        drawLastTextureFilter.draw();
+        GLES20.glBindFramebuffer(GLES20.GL_FRAMEBUFFER, 0);
+
 
     }
 

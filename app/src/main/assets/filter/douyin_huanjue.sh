@@ -4,14 +4,11 @@ uniform sampler2D vTexture;     // 当前输入纹理
 uniform sampler2D inputTextureLast; // 上一次的纹理
 uniform sampler2D lookupTable;      // 颜色查找表纹理
 
-// 分RGB通道混合，不同颜色通道混合值不一样
-const lowp vec3 blendValue = vec3(0.1, 0.3, 0.6);
-
 // 计算lut映射之后的颜色值
-vec4 getLutColor(vec4 textureColor, sampler2D lookupTexture) {
+vec4 getLutColor(vec4 textureColor) {
     mediump float blueColor = textureColor.b * 63.0;
-
     mediump vec2 quad1;
+
     quad1.y = floor(floor(blueColor) / 8.0);
     quad1.x = floor(blueColor) - (quad1.y * 8.0);
 
@@ -22,13 +19,15 @@ vec4 getLutColor(vec4 textureColor, sampler2D lookupTexture) {
     highp vec2 texPos1;
     texPos1.x = (quad1.x * 0.125) + 0.5/512.0 + ((0.125 - 1.0/512.0) * textureColor.r);
     texPos1.y = (quad1.y * 0.125) + 0.5/512.0 + ((0.125 - 1.0/512.0) * textureColor.g);
+    texPos1.y = 1.0-texPos1.y;
 
     highp vec2 texPos2;
     texPos2.x = (quad2.x * 0.125) + 0.5/512.0 + ((0.125 - 1.0/512.0) * textureColor.r);
     texPos2.y = (quad2.y * 0.125) + 0.5/512.0 + ((0.125 - 1.0/512.0) * textureColor.g);
+    texPos2.y = 1.0-texPos2.y;
 
-    lowp vec4 newColor1 = texture2D(lookupTexture, texPos1);
-    lowp vec4 newColor2 = texture2D(lookupTexture, texPos2);
+    lowp vec4 newColor1 = texture2D(lookupTable, texPos1);
+    lowp vec4 newColor2 = texture2D(lookupTable, texPos2);
 
     lowp vec4 newColor = mix(newColor1, newColor2, fract(blueColor));
     vec4 color = vec4(newColor.rgb, textureColor.w);
@@ -41,9 +40,8 @@ void main() {
     // 上一轮纹理颜色
     vec4 lastColor = texture2D(inputTextureLast, textureCoordinate);
     // lut映射的颜色值
-    vec4 lutColor = getLutColor(currentColor, lookupTable);
+    vec4 lutColor = getLutColor(currentColor);
     // 将lut映射之后的纹理与上一轮的纹理进行线性混合
-   // gl_FragColor = vec4(mix(lastColor.rgb, lutColor.rgb, blendValue), currentColor.a);
     gl_FragColor = vec4(0.95 * lastColor.r  +  0.05* lutColor.r,lutColor.g * 0.2 + lastColor.g * 0.8, lutColor.b,1.0);
 
 }

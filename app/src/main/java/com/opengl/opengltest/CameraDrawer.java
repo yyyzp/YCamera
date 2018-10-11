@@ -98,7 +98,7 @@ public class CameraDrawer implements GLSurfaceView.Renderer {
         drawFilter = new CameraFilter(resources);
 //        beautyFilter = new Beauty(resources);
         douyinHuanjue = new DouyinHuanjue(resources);
-        douyinHuanjue.setLookupBitmap(BitmapFactory.decodeResource(resources, R.mipmap.amatorka));
+        douyinHuanjue.setLookupBitmap(BitmapFactory.decodeResource(resources, R.mipmap.lookup_vertigo));
         waterMarkFilter = new WaterMarkFilter(resources);
         waterMarkFilter.setWaterMark(BitmapFactory.decodeResource(resources, R.mipmap.fei));
         waterMarkFilter.setPosition(30, 50, 100, 100);
@@ -114,12 +114,6 @@ public class CameraDrawer implements GLSurfaceView.Renderer {
         drawFilter.create();
         drawFilter.setTextureId(textureID);
         drawLastTextureFilter.create();
-//        douyinFilter.create();
-//        douyinFilter.setTextureId(textureID);
-//        beautyFilter.create();
-//        beautyFilter.setTextureId(textureID);
-//        douyinHuanjue.create();
-//        douyinHuanjue.setTextureId(textureID);
         showFilter.create();
         waterMarkFilter.create();
         douyinHuanjue.create();
@@ -196,6 +190,8 @@ public class CameraDrawer implements GLSurfaceView.Renderer {
         GLES20.glBindFramebuffer(GLES20.GL_FRAMEBUFFER, fFrame[0]);
         GLES20.glViewport(0, 0, mPreviewWidth, mPreviewHeight);
         drawFilter.draw();
+
+//        waterMarkFilter.draw();
 //        beautyFilter.draw();
 //        douyinFilter.draw();
 //        douyinHuanjue.draw();
@@ -268,6 +264,7 @@ public class CameraDrawer implements GLSurfaceView.Renderer {
         GLES20.glViewport(0, 0, mPreviewWidth, mPreviewHeight);
         douyinHuanjue.setTextureId(fTexture[0]);
         douyinHuanjue.draw();
+
         GLES20.glBindFramebuffer(GLES20.GL_FRAMEBUFFER, 0);
 
         //将帧缓存1的纹理应用到drawLastTextureFilter 绘制到帧缓存2中 作为上一帧的纹理设置给幻觉filter 这个步骤是必须的 否则达不到效果
@@ -275,6 +272,8 @@ public class CameraDrawer implements GLSurfaceView.Renderer {
         GLES20.glViewport(0, 0, mPreviewWidth, mPreviewHeight);
         drawLastTextureFilter.setTextureId(fTexture[1]);
         drawLastTextureFilter.draw();
+        waterMarkFilter.draw();
+
         GLES20.glBindFramebuffer(GLES20.GL_FRAMEBUFFER, 0);
 
 

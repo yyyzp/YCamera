@@ -8,6 +8,7 @@ import android.text.TextUtils;
 
 
 import com.opengl.opengltest.utils.OpenGLUtils;
+import com.opengl.opengltest.utils.TextureRotationUtils;
 
 import java.nio.FloatBuffer;
 import java.util.Arrays;
@@ -19,20 +20,7 @@ import java.util.LinkedList;
  */
 
 public class GLImageFilter {
-    public static final int CoordsPerVertex = 2;
 
-    public static final float CubeVertices[] = {
-            -1.0f, -1.0f,  // 0 bottom left
-            1.0f,  -1.0f,  // 1 bottom right
-            -1.0f,  1.0f,  // 2 top left
-            1.0f,   1.0f,  // 3 top right
-    };
-    public static final float TextureVertices[] = {
-            0.0f, 0.0f,     // 0 bottom left
-            1.0f, 0.0f,     // 1 bottom right
-            0.0f, 1.0f,     // 2 top left
-            1.0f, 1.0f      // 3 top right
-    };
     protected static final String VERTEX_SHADER = "" +
             "uniform mat4 uMVPMatrix;                                   \n" +
             "attribute vec4 aPosition;                                  \n" +
@@ -72,9 +60,9 @@ public class GLImageFilter {
     // 纹理坐标缓冲
     protected FloatBuffer mTextureBuffer;
     // 每个顶点坐标有几个参数
-    protected int mCoordsPerVertex = CoordsPerVertex;
+    protected int mCoordsPerVertex = TextureRotationUtils.CoordsPerVertex;
     // 顶点坐标数量
-    protected int mVertexCount = CubeVertices.length / mCoordsPerVertex;
+    protected int mVertexCount = TextureRotationUtils.CubeVertices.length / mCoordsPerVertex;
 
     // 句柄
     protected int mProgramHandle;
@@ -101,11 +89,7 @@ public class GLImageFilter {
 
     // 变换矩阵
     protected float[] mMVPMatrix = new float[16];
-
-    public GLImageFilter() {
-        this(null, VERTEX_SHADER, FRAGMENT_SHADER_2D);
-    }
-
+    private int mTextureId;
     public GLImageFilter(Context context) {
         this(context, VERTEX_SHADER, FRAGMENT_SHADER_2D);
     }
@@ -129,8 +113,8 @@ public class GLImageFilter {
      */
     protected void initBuffers() {
         releaseBuffers();
-        mVertexBuffer = OpenGLUtils.createFloatBuffer(CubeVertices);
-        mTextureBuffer = OpenGLUtils.createFloatBuffer(TextureVertices);
+        mVertexBuffer = OpenGLUtils.createFloatBuffer(TextureRotationUtils.CubeVertices);
+        mTextureBuffer = OpenGLUtils.createFloatBuffer(TextureRotationUtils.TextureVertices);
     }
 
     /**
@@ -170,7 +154,6 @@ public class GLImageFilter {
 
     /**
      * Surface发生变化时调用
-     *
      * @param width
      * @param height
      */
@@ -180,8 +163,7 @@ public class GLImageFilter {
     }
 
     /**
-     * 显示视图发生变化时调用
-     *
+     *  显示视图发生变化时调用
      * @param width
      * @param height
      */
@@ -192,7 +174,6 @@ public class GLImageFilter {
 
     /**
      * 绘制Frame
-     *
      * @param textureId
      */
     public boolean drawFrame(int textureId) {
@@ -201,13 +182,13 @@ public class GLImageFilter {
 
     /**
      * 绘制Frame
-     *
      * @param textureId
      * @param vertexBuffer
      * @param textureBuffer
      */
     public boolean drawFrame(int textureId, FloatBuffer vertexBuffer,
                              FloatBuffer textureBuffer) {
+        mTextureId=textureId;
         // 没有初始化、输入纹理不合法、滤镜不可用时直接返回
         if (!mIsInitialized || textureId == OpenGLUtils.GL_NOT_INIT || !mFilterEnable) {
             return false;
@@ -252,7 +233,6 @@ public class GLImageFilter {
 
     /**
      * 绘制到FBO
-     *
      * @param textureId
      * @return FBO绑定的Texture
      */
@@ -262,7 +242,6 @@ public class GLImageFilter {
 
     /**
      * 绘制到FBO
-     *
      * @param textureId
      * @param vertexBuffer
      * @param textureBuffer
@@ -326,7 +305,9 @@ public class GLImageFilter {
     public int getTextureType() {
         return GLES30.GL_TEXTURE_2D;
     }
-
+    public int getTextureId(){
+        return mFrameBufferTextures[0];
+    }
     /**
      * 调用glDrawArrays/glDrawElements之前，方便添加其他属性
      */
@@ -355,7 +336,6 @@ public class GLImageFilter {
 
     /**
      * 创建FBO
-     *
      * @param width
      * @param height
      */
@@ -404,7 +384,6 @@ public class GLImageFilter {
 
     /**
      * 设置变换矩阵
-     *
      * @param matrix
      */
     public void setMVPMatrix(float[] matrix) {
@@ -415,7 +394,6 @@ public class GLImageFilter {
 
     /**
      * 判断是否初始化
-     *
      * @return
      */
     public boolean isInitialized() {
@@ -424,7 +402,6 @@ public class GLImageFilter {
 
     /**
      * 设置滤镜是否可用
-     *
      * @param enable
      */
     public void setFilterEnable(boolean enable) {
@@ -433,7 +410,6 @@ public class GLImageFilter {
 
     /**
      * 设置时钟
-     *
      * @param currentTimer
      */
     public void setTimerValue(float currentTimer) {
@@ -442,7 +418,6 @@ public class GLImageFilter {
 
     /**
      * 获取输出宽度
-     *
      * @return
      */
     public int getDisplayWidth() {
@@ -451,7 +426,6 @@ public class GLImageFilter {
 
     /**
      * 获取输出高度
-     *
      * @return
      */
     public int getDisplayHeight() {
@@ -548,7 +522,6 @@ public class GLImageFilter {
 
     /**
      * 添加延时任务
-     *
      * @param runnable
      */
     protected void runOnDraw(final Runnable runnable) {

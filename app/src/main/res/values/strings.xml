@@ -4,4 +4,9 @@
     <string name="title_home">Home</string>
     <string name="title_dashboard">Dashboard</string>
     <string name="title_notifications">Notifications</string>
+
+    <!--权限请求-->
+    <string name="request_camera_permission">需要相机权限</string>
+    <string name="request_storage_permission">需要存储权限</string>
+    <string name="request_sound_permission">需要录音权限</string>
 </resources>

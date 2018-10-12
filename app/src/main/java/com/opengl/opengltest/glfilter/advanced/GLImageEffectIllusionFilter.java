@@ -10,16 +10,12 @@ import com.opengl.opengltest.utils.OpenGLUtils;
  * 幻觉滤镜
  */
 public class GLImageEffectIllusionFilter extends GLImageFilter {
-
     private static final String FRAGMENT_SHADER = ""
             + "precision mediump float;\n" +
             "varying vec2 textureCoordinate;\n" +
             "uniform sampler2D inputTexture;     // 当前输入纹理\n" +
             "uniform sampler2D inputTextureLast; // 上一次的纹理\n" +
             "uniform sampler2D lookupTable;      // 颜色查找表纹理\n" +
-            "\n" +
-            "// 分RGB通道混合，不同颜色通道混合值不一样\n" +
-            "const lowp vec3 blendValue = vec3(0.1, 0.3, 0.6);\n" +
             "\n" +
             "// 计算lut映射之后的颜色值\n" +
             "vec4 getLutColor(vec4 textureColor, sampler2D lookupTexture) {\n" +
@@ -57,7 +53,7 @@ public class GLImageEffectIllusionFilter extends GLImageFilter {
             "    // lut映射的颜色值\n" +
             "    vec4 lutColor = getLutColor(currentColor, lookupTable);\n" +
             "    // 将lut映射之后的纹理与上一轮的纹理进行线性混合\n" +
-            "    gl_FragColor = vec4(mix(lastColor.rgb, lutColor.rgb, blend), currentColor.a);\n" +
+            "    gl_FragColor = vec4(0.95 * lastColor.r  +  0.05* lutColor.r,lutColor.g * 0.2 + lastColor.g * 0.8, lutColor.b,1.0);\n" +
             "}";
 
     private int mLastTextureHandle;
@@ -82,6 +78,8 @@ public class GLImageEffectIllusionFilter extends GLImageFilter {
             mLastTextureHandle = GLES30.glGetUniformLocation(mProgramHandle, "inputTextureLast");
             mLookupTableHandle = GLES30.glGetUniformLocation(mProgramHandle, "lookupTable");
         }
+        setLookupTable(  OpenGLUtils.createTextureFromAssets(mContext, "filter/lookup_vertigo.png"));
+
     }
 
     @Override

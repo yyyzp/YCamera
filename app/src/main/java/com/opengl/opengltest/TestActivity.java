@@ -94,21 +94,7 @@ public class TestActivity extends Activity implements View.OnClickListener {
                     pausing = false;
                 }
                 break;
-            case R.id.btn_1:
-                mCameraView.setBeautyLevel(1);
-                break;
-            case R.id.btn_2:
-                mCameraView.setBeautyLevel(2);
-                break;
-            case R.id.btn_3:
-                mCameraView.setBeautyLevel(3);
-                break;
-            case R.id.btn_4:
-                mCameraView.setBeautyLevel(4);
-                break;
-            case R.id.btn_5:
-                mCameraView.setBeautyLevel(5);
-                break;
+
             case R.id.btn_change_camera:
                 mCameraView.switchCamera();
                 break;

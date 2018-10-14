@@ -1,8 +1,10 @@
 package com.opengl.opengltest.glfilter.advanced;
 
 import android.content.Context;
+import android.graphics.BitmapFactory;
 import android.opengl.GLES30;
 
+import com.opengl.opengltest.R;
 import com.opengl.opengltest.glfilter.base.GLImageFilter;
 import com.opengl.opengltest.utils.OpenGLUtils;
 
@@ -10,6 +12,7 @@ import com.opengl.opengltest.utils.OpenGLUtils;
  * 幻觉滤镜
  */
 public class GLImageEffectIllusionFilter extends GLImageFilter {
+
     private static final String FRAGMENT_SHADER = ""
             + "precision mediump float;\n" +
             "varying vec2 textureCoordinate;\n" +
@@ -32,10 +35,12 @@ public class GLImageEffectIllusionFilter extends GLImageFilter {
             "    highp vec2 texPos1;\n" +
             "    texPos1.x = (quad1.x * 0.125) + 0.5/512.0 + ((0.125 - 1.0/512.0) * textureColor.r);\n" +
             "    texPos1.y = (quad1.y * 0.125) + 0.5/512.0 + ((0.125 - 1.0/512.0) * textureColor.g);\n" +
+            "    texPos1.y = 1.0-texPos1.y;\n" +
             "\n" +
             "    highp vec2 texPos2;\n" +
             "    texPos2.x = (quad2.x * 0.125) + 0.5/512.0 + ((0.125 - 1.0/512.0) * textureColor.r);\n" +
             "    texPos2.y = (quad2.y * 0.125) + 0.5/512.0 + ((0.125 - 1.0/512.0) * textureColor.g);\n" +
+            "    texPos2.y = 1.0-texPos2.y;\n"+
             "\n" +
             "    lowp vec4 newColor1 = texture2D(lookupTexture, texPos1);\n" +
             "    lowp vec4 newColor2 = texture2D(lookupTexture, texPos2);\n" +
@@ -60,9 +65,11 @@ public class GLImageEffectIllusionFilter extends GLImageFilter {
     private int mLookupTableHandle;
     private int mLastTexture;
     private int mLookupTable;
+
     public GLImageEffectIllusionFilter() {
         this(null, VERTEX_SHADER, FRAGMENT_SHADER);
     }
+
     public GLImageEffectIllusionFilter(Context context) {
         this(context, VERTEX_SHADER, FRAGMENT_SHADER);
     }
@@ -78,7 +85,8 @@ public class GLImageEffectIllusionFilter extends GLImageFilter {
             mLastTextureHandle = GLES30.glGetUniformLocation(mProgramHandle, "inputTextureLast");
             mLookupTableHandle = GLES30.glGetUniformLocation(mProgramHandle, "lookupTable");
         }
-        setLookupTable(  OpenGLUtils.createTextureFromAssets(mContext, "filter/lookup_vertigo.png"));
+
+        setLookupTable(OpenGLUtils.createTextureFromBitmap(BitmapFactory.decodeResource(mContext.getResources(), R.mipmap.lookup_vertigo)));
 
     }
 
@@ -94,11 +102,12 @@ public class GLImageEffectIllusionFilter extends GLImageFilter {
         // 绑定lut纹理
         GLES30.glActiveTexture(GLES30.GL_TEXTURE2);
         GLES30.glBindTexture(getTextureType(), mLookupTable);
-        GLES30.glUniform1i(mLastTextureHandle, 2);
+        GLES30.glUniform1i(mLookupTableHandle, 2);
     }
 
     /**
      * 设置上一次纹理id
+     *
      * @param lastTexture
      */
     public void setLastTexture(int lastTexture) {
@@ -107,6 +116,7 @@ public class GLImageEffectIllusionFilter extends GLImageFilter {
 
     /**
      * 设置lut纹理id
+     *
      * @param lookupTableTexture
      */
     public void setLookupTable(int lookupTableTexture) {

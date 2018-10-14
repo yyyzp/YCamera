@@ -187,8 +187,7 @@ public final class RenderManager {
             currentTexture = mInputFilter.drawFrameBuffer(currentTexture, mVertexBuffer, mTextureBuffer);
         }
         if (mGlImageEffectIllusionFilter != null) {
-            mGlImageEffectIllusionFilter.setLastTexture(currentTexture);
-            currentTexture =  mGlImageEffectIllusionFilter.drawFrameBuffer(currentTexture);
+            currentTexture = mGlImageEffectIllusionFilter.drawFrameBuffer(currentTexture);
         }
         // 如果处于对比状态，不做处理
         if (!mCameraParam.showCompare) {
@@ -205,6 +204,7 @@ public final class RenderManager {
         if (mDisplayFilter != null) {
             mDisplayFilter.drawFrame(currentTexture);
         }
+        mGlImageEffectIllusionFilter.setLastTexture(currentTexture);
 
         return currentTexture;
     }
@@ -274,7 +274,11 @@ public final class RenderManager {
             mColorFilter.initFrameBuffer(mTextureWidth, mTextureHeight);
             mColorFilter.onDisplaySizeChanged(mViewWidth, mViewHeight);
         }
-
+        if (mGlImageEffectIllusionFilter != null) {
+            mGlImageEffectIllusionFilter.onInputSizeChanged(mTextureWidth, mTextureHeight);
+            mGlImageEffectIllusionFilter.initFrameBuffer(mTextureWidth, mTextureHeight);
+            mGlImageEffectIllusionFilter.onDisplaySizeChanged(mViewWidth, mViewHeight);
+        }
         if (mDisplayFilter != null) {
             mDisplayFilter.onInputSizeChanged(mTextureWidth, mTextureHeight);
             mDisplayFilter.onDisplaySizeChanged(mViewWidth, mViewHeight);

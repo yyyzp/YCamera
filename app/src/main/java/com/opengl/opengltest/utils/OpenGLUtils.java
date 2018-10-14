@@ -419,7 +419,32 @@ public class OpenGLUtils {
         }
         return textureHandle[0];
     }
+    /**
+     * 加载mipmap纹理
+     * @return
+     */
+    public static int createTextureFromBitmap(Bitmap bitmap) {
+        int[] textureHandle = new int[1];
+        GLES30.glGenTextures(1, textureHandle, 0);
+        if (textureHandle[0] != 0) {
+            GLES30.glBindTexture(GLES30.GL_TEXTURE_2D, textureHandle[0]);
 
+            GLES30.glTexParameterf(GLES30.GL_TEXTURE_2D,
+                    GLES30.GL_TEXTURE_MAG_FILTER, GLES30.GL_LINEAR);
+            GLES30.glTexParameterf(GLES30.GL_TEXTURE_2D,
+                    GLES30.GL_TEXTURE_MIN_FILTER, GLES30.GL_LINEAR);
+            GLES30.glTexParameterf(GLES30.GL_TEXTURE_2D,
+                    GLES30.GL_TEXTURE_WRAP_S, GLES30.GL_CLAMP_TO_EDGE);
+            GLES30.glTexParameterf(GLES30.GL_TEXTURE_2D,
+                    GLES30.GL_TEXTURE_WRAP_T, GLES30.GL_CLAMP_TO_EDGE);
+            GLUtils.texImage2D(GLES30.GL_TEXTURE_2D, 0, bitmap, 0);
+            bitmap.recycle();
+        }
+        if (textureHandle[0] == 0) {
+            throw new RuntimeException("Error loading texture.");
+        }
+        return textureHandle[0];
+    }
     /**
      * 创建OES 类型的Texture
      * @return

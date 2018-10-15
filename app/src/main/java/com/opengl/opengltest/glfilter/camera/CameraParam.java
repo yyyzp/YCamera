@@ -14,7 +14,10 @@ import com.opengl.opengltest.glfilter.model.GalleryType;
  * 相机配置参数
  */
 public final class CameraParam {
-
+    public static final int TYPE_FILTER=0;
+    public static final int TYPE_EFFECT=1;
+    public static final int TYPE_BEAUTY=2;
+    public int filter_type;
     // 最大权重
     public static final int MAX_FOCUS_WEIGHT = 1000;
     // 录制时长(毫秒)

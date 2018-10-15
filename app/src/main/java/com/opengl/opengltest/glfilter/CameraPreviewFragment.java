@@ -49,6 +49,8 @@ import com.opengl.opengltest.glfilter.utils.StringUtils;
 import com.opengl.opengltest.mediacodecplayer.AspectFrameLayout;
 import com.opengl.opengltest.utils.BitmapUtils;
 
+import org.w3c.dom.Text;
+
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -84,6 +86,9 @@ public class CameraPreviewFragment extends Fragment implements View.OnClickListe
     // 处于延时拍照状态
     private boolean mDelayTaking = false;
 
+    // 滤镜页面
+    private PreviewEffectFragment mEffectFragment;
+
     // 预览参数
     private CameraParam mCameraParam;
 
@@ -113,6 +118,7 @@ public class CameraPreviewFragment extends Fragment implements View.OnClickListe
     // 视频预览按钮
     private Button mBtnRecordPreview;
 
+    private TextView tvEffect;
     // 相机类型指示文字
     private List<String> mIndicatorText = new ArrayList<String>();
 
@@ -131,7 +137,7 @@ public class CameraPreviewFragment extends Fragment implements View.OnClickListe
     public void onAttach(Context context) {
         super.onAttach(context);
         mActivity = getActivity();
-            mCameraParam.brightness = -1;
+        mCameraParam.brightness = -1;
         mMainHandler = new Handler(context.getMainLooper());
         mCameraEnable = PermissionUtils.permissionChecking(mActivity, Manifest.permission.CAMERA);
         mStorageWriteEnable = PermissionUtils.permissionChecking(mActivity, Manifest.permission.WRITE_EXTERNAL_STORAGE);
@@ -167,6 +173,7 @@ public class CameraPreviewFragment extends Fragment implements View.OnClickListe
 
     /**
      * 初始化页面
+     *
      * @param view
      */
     private void initView(View view) {
@@ -186,6 +193,8 @@ public class CameraPreviewFragment extends Fragment implements View.OnClickListe
         mBtnShutter.setOnShutterListener(mShutterListener);
         mBtnShutter.setOnClickListener(this);
 
+        tvEffect = view.findViewById(R.id.tvEffect);
+        tvEffect.setOnClickListener(this);
     }
 
 
@@ -226,6 +235,7 @@ public class CameraPreviewFragment extends Fragment implements View.OnClickListe
 
     /**
      * 处理返回事件
+     *
      * @return
      */
     public boolean onBackPressed() {
@@ -244,6 +254,8 @@ public class CameraPreviewFragment extends Fragment implements View.OnClickListe
         int i = v.getId();
         if (i == R.id.btn_shutter) {
             takePicture();
+        } else if (i == R.id.tvEffect) {
+            showEffectView();
         }
     }
 
@@ -277,7 +289,6 @@ public class CameraPreviewFragment extends Fragment implements View.OnClickListe
     }
 
 
-
     /**
      * 切换相机
      */
@@ -289,6 +300,37 @@ public class CameraPreviewFragment extends Fragment implements View.OnClickListe
         PreviewRenderer.getInstance().switchCamera();
     }
 
+    /**
+     * 显示滤镜页面
+     */
+    private void showEffectView() {
+        isShowingFilters = true;
+        FragmentTransaction ft = getChildFragmentManager().beginTransaction();
+        if (mEffectFragment == null) {
+            mEffectFragment = new PreviewEffectFragment();
+            ft.add(R.id.fragment_container, mEffectFragment);
+        } else {
+            ft.show(mEffectFragment);
+        }
+        ft.commit();
+        mEffectFragment.scrollToCurrentFilter(mFilterIndex);
+        hideBottomLayout();
+    }
+
+    /**
+     * 隐藏滤镜页面
+     */
+    private void hideEffectView() {
+        if (isShowingFilters) {
+            isShowingFilters = false;
+            if (mEffectFragment != null) {
+                FragmentTransaction ft = getChildFragmentManager().beginTransaction();
+                ft.hide(mEffectFragment);
+                ft.commit();
+            }
+        }
+        resetBottomLayout();
+    }
 
     /**
      * 拍照
@@ -314,6 +356,33 @@ public class CameraPreviewFragment extends Fragment implements View.OnClickListe
         }
     }
 
+    /**
+     * 隐藏底部布局按钮
+     */
+    private void hideBottomLayout() {
+        tvEffect.setVisibility(View.GONE);
+        ViewGroup.LayoutParams layoutParams = mBtnShutter.getLayoutParams();
+        layoutParams.width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
+                60, mActivity.getResources().getDisplayMetrics());
+        layoutParams.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
+                60, mActivity.getResources().getDisplayMetrics());
+        mBtnShutter.setLayoutParams(layoutParams);
+    }
+
+    /**
+     * 恢复底部布局
+     */
+    private void resetBottomLayout() {
+        mBtnShutter.setOuterBackgroundColor(mCameraParam.currentRatio < CameraParam.Ratio_4_3
+                ? R.color.shutter_gray_light : R.color.shutter_gray_dark);
+        ViewGroup.LayoutParams layoutParams = mBtnShutter.getLayoutParams();
+        layoutParams.width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
+                100, mActivity.getResources().getDisplayMetrics());
+        layoutParams.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
+                100, mActivity.getResources().getDisplayMetrics());
+        mBtnShutter.setLayoutParams(layoutParams);
+        tvEffect.setVisibility(View.VISIBLE);
+    }
 
     // ------------------------------- SurfaceView 滑动、点击回调 ----------------------------------
     private CainSurfaceView.OnTouchScroller mTouchScroller = new CainSurfaceView.OnTouchScroller() {
@@ -377,8 +446,7 @@ public class CameraPreviewFragment extends Fragment implements View.OnClickListe
             mMainHandler.post(new Runnable() {
                 @Override
                 public void run() {
-//                    hideStickerView();
-//                    hideEffectView();
+                    hideEffectView();
                 }
             });
 
@@ -393,7 +461,7 @@ public class CameraPreviewFragment extends Fragment implements View.OnClickListe
                 List<String> focusModes = CameraEngine.getInstance().getCamera()
                         .getParameters().getSupportedFocusModes();
                 if (focusModes != null && focusModes.contains(Camera.Parameters.FOCUS_MODE_AUTO)) {
-                    CameraEngine.getInstance().setFocusArea(CameraEngine.getFocusArea((int)x, (int)y,
+                    CameraEngine.getInstance().setFocusArea(CameraEngine.getFocusArea((int) x, (int) y,
                             mCameraSurfaceView.getWidth(), mCameraSurfaceView.getHeight(), FocusSize));
                     mMainHandler.post(new Runnable() {
                         @Override
@@ -411,8 +479,6 @@ public class CameraPreviewFragment extends Fragment implements View.OnClickListe
         }
 
     };
-
-
 
 
     // -------------------------------------- fps回调 -------------------------------------------
@@ -434,7 +500,6 @@ public class CameraPreviewFragment extends Fragment implements View.OnClickListe
     };
 
 
-
     // ------------------------------------ 预览回调 ---------------------------------------------
     private OnCameraCallback mCameraCallback = new OnCameraCallback() {
 
@@ -449,7 +514,7 @@ public class CameraPreviewFragment extends Fragment implements View.OnClickListe
                 mBtnShutter.setEnableOpened(true);
             }
             // 这里解决第一次打开时较慢的情况
-                requestRender();
+            requestRender();
 
         }
 
@@ -462,8 +527,6 @@ public class CameraPreviewFragment extends Fragment implements View.OnClickListe
     private void requestRender() {
         PreviewRenderer.getInstance().requestRender();
     }
-
-
 
 
     // ------------------------------------ 录制回调 -------------------------------------------
@@ -570,7 +633,6 @@ public class CameraPreviewFragment extends Fragment implements View.OnClickListe
     };
 
 
-
     /**
      * 停止录制或者预览视频
      */
@@ -596,7 +658,7 @@ public class CameraPreviewFragment extends Fragment implements View.OnClickListe
             PermissionConfirmDialogFragment.newInstance(getString(R.string.request_camera_permission), PermissionUtils.REQUEST_CAMERA_PERMISSION, true)
                     .show(getChildFragmentManager(), FRAGMENT_DIALOG);
         } else {
-            requestPermissions(new String[]{ Manifest.permission.CAMERA},
+            requestPermissions(new String[]{Manifest.permission.CAMERA},
                     PermissionUtils.REQUEST_CAMERA_PERMISSION);
         }
     }
@@ -609,7 +671,7 @@ public class CameraPreviewFragment extends Fragment implements View.OnClickListe
             PermissionConfirmDialogFragment.newInstance(getString(R.string.request_storage_permission), PermissionUtils.REQUEST_STORAGE_PERMISSION)
                     .show(getChildFragmentManager(), FRAGMENT_DIALOG);
         } else {
-            requestPermissions(new String[]{ Manifest.permission.READ_EXTERNAL_STORAGE},
+            requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
                     PermissionUtils.REQUEST_STORAGE_PERMISSION);
         }
     }
@@ -622,7 +684,7 @@ public class CameraPreviewFragment extends Fragment implements View.OnClickListe
             PermissionConfirmDialogFragment.newInstance(getString(R.string.request_sound_permission), PermissionUtils.REQUEST_SOUND_PERMISSION)
                     .show(getChildFragmentManager(), FRAGMENT_DIALOG);
         } else {
-            requestPermissions(new String[]{ Manifest.permission.RECORD_AUDIO},
+            requestPermissions(new String[]{Manifest.permission.RECORD_AUDIO},
                     PermissionUtils.REQUEST_SOUND_PERMISSION);
         }
     }
@@ -681,6 +743,7 @@ public class CameraPreviewFragment extends Fragment implements View.OnClickListe
     private BroadcastReceiver mHomePressReceiver = new BroadcastReceiver() {
         private final String SYSTEM_DIALOG_REASON_KEY = "reason";
         private final String SYSTEM_DIALOG_REASON_HOME_KEY = "homekey";
+
         @Override
         public void onReceive(Context context, Intent intent) {
             String action = intent.getAction();

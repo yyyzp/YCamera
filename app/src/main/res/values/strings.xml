@@ -9,4 +9,14 @@
     <string name="request_camera_permission">需要相机权限</string>
     <string name="request_storage_permission">需要存储权限</string>
     <string name="request_sound_permission">需要录音权限</string>
+
+    <!-- 美颜 -->
+    <string-array name="preview_beauty">
+        <item>美颜</item>
+    </string-array>
+
+    <!-- 特效-->
+    <string-array name="preview_effect">
+        <item>幻觉</item>
+    </string-array>
 </resources>

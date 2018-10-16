@@ -47,6 +47,8 @@ public final class RenderManager {
     // 显示输出
     private GLImageFilter mDisplayFilter;
 
+    //特效滤镜
+    private GLImageFilter mEffectFilter;
     //幻觉滤镜
     private GLImageEffectIllusionFilter mGlImageEffectIllusionFilter;
 
@@ -174,6 +176,28 @@ public final class RenderManager {
     }
 
     /**
+     * 切换特效滤镜
+     *
+     * @param context
+     * @param type
+     */
+    public void changeEffectFilter(Context context, GLImageFilterType type) {
+        if (mEffectFilter != null) {
+            mEffectFilter.release();
+            mEffectFilter = null;
+        }
+        mEffectFilter = GLImageFilterManager.getEffectFilter(context, type);
+        mEffectFilter.onInputSizeChanged(mTextureWidth, mTextureHeight);
+        mEffectFilter.initFrameBuffer(mTextureWidth, mTextureHeight);
+        mEffectFilter.onDisplaySizeChanged(mViewWidth, mViewHeight);
+
+        mGlImageEffectIllusionFilter = new GLImageEffectIllusionFilter(context);
+        mGlImageEffectIllusionFilter.onInputSizeChanged(mTextureWidth, mTextureHeight);
+        mGlImageEffectIllusionFilter.initFrameBuffer(mTextureWidth, mTextureHeight);
+        mGlImageEffectIllusionFilter.onDisplaySizeChanged(mViewWidth, mViewHeight);
+    }
+
+    /**
      * 绘制纹理
      *
      * @param inputTexture
@@ -186,26 +210,25 @@ public final class RenderManager {
             mInputFilter.setTextureTransformMatirx(mMatrix);
             currentTexture = mInputFilter.drawFrameBuffer(currentTexture, mVertexBuffer, mTextureBuffer);
         }
-        if (mGlImageEffectIllusionFilter != null) {
-            currentTexture = mGlImageEffectIllusionFilter.drawFrameBuffer(currentTexture);
-        }
-        // 如果处于对比状态，不做处理
-        if (!mCameraParam.showCompare) {
-
-            // 绘制LUT滤镜
-            if (mColorFilter != null) {
-                currentTexture = mColorFilter.drawFrameBuffer(currentTexture);
+        if (mColorFilter != null)
+            if (mGlImageEffectIllusionFilter != null) {
+                if (mCameraParam.enableEffect) {
+                    currentTexture = mGlImageEffectIllusionFilter.drawFrameBuffer(currentTexture);
+                }
             }
 
-
+        if (mColorFilter != null) {
+            currentTexture = mColorFilter.drawFrameBuffer(currentTexture);
         }
-
         // 显示输出，需要调整视口大小
         if (mDisplayFilter != null) {
             mDisplayFilter.drawFrame(currentTexture);
         }
-        mGlImageEffectIllusionFilter.setLastTexture(currentTexture);
-
+        if (mGlImageEffectIllusionFilter != null) {
+            if (mCameraParam.enableEffect) {
+                mGlImageEffectIllusionFilter.setLastTexture(currentTexture);
+            }
+        }
         return currentTexture;
     }
 

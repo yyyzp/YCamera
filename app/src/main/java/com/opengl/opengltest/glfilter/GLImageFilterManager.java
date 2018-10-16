@@ -83,6 +83,7 @@ public final class GLImageFilterManager {
         List<GLImageFilterType> filterTypes = new ArrayList<>();
         filterTypes.add(GLImageFilterType.SOURCE);
         filterTypes.add(GLImageFilterType.BLACKWHITE);
+        filterTypes.add(GLImageFilterType.EFFECTILLUSION);
         return filterTypes;
     }
 
@@ -96,6 +97,7 @@ public final class GLImageFilterManager {
 
         filterNames.add("原图");
         filterNames.add("黑白");
+        filterNames.add("幻觉");
 
         return filterNames;
     }

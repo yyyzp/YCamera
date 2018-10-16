@@ -14,9 +14,9 @@ import com.opengl.opengltest.glfilter.model.GalleryType;
  * 相机配置参数
  */
 public final class CameraParam {
-    public static final int TYPE_FILTER=0;
-    public static final int TYPE_EFFECT=1;
-    public static final int TYPE_BEAUTY=2;
+    public static final int TYPE_FILTER = 0;
+    public static final int TYPE_EFFECT = 1;
+    public static final int TYPE_BEAUTY = 2;
     public int filter_type;
     // 最大权重
     public static final int MAX_FOCUS_WEIGHT = 1000;
@@ -36,7 +36,7 @@ public final class CameraParam {
     public static final float Ratio_16_9 = 0.5625f;
 
     // 对焦权重最大值
-    public static final int Weight =  100;
+    public static final int Weight = 100;
 
     // 是否显示人脸关键点
     public boolean drawFacePoints;
@@ -107,7 +107,8 @@ public final class CameraParam {
     // 是否允许暗角
     public boolean enableVignette;
 
-
+    // 是否允许特效
+    public boolean enableEffect;
     private static final CameraParam mInstance = new CameraParam();
 
     private CameraParam() {
@@ -150,11 +151,13 @@ public final class CameraParam {
         isTakePicture = false;
         enableDepthBlur = false;
         enableVignette = false;
+        enableEffect = false;
 
     }
 
     /**
      * 获取相机配置参数
+     *
      * @return
      */
     public static CameraParam getInstance() {
@@ -163,6 +166,7 @@ public final class CameraParam {
 
     /**
      * 设置预览长宽比
+     *
      * @param aspectRatio
      */
     public void setAspectRatio(AspectRatio aspectRatio) {
@@ -180,6 +184,7 @@ public final class CameraParam {
 
     /**
      * 设置对焦权重
+     *
      * @param focusWeight
      */
     public void setFocusWeight(int focusWeight) {

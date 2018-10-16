@@ -221,6 +221,7 @@ public class PreviewEffectFragment extends Fragment implements View.OnClickListe
      * 显示美颜视图布局
      */
     private void showBeautyLayout() {
+        mCameraParam.enableEffect = false;
         mLayoutProgress.setVisibility(View.VISIBLE);
         if (mLayoutBeauty == null) {
             mLayoutBeauty = (RelativeLayout) mInflater.inflate(R.layout.view_preview_beauty, null);
@@ -251,6 +252,8 @@ public class PreviewEffectFragment extends Fragment implements View.OnClickListe
      * 显示特效布局
      */
     private void showEffectLayout() {
+        mCameraParam.enableEffect = true;
+        PreviewRenderer.getInstance().changeEffectFilterType(GLImageFilterType.EFFECTILLUSION);
         if (mLayoutEffect == null) {
             mLayoutEffect = (LinearLayout) mInflater.inflate(R.layout.view_preview_effect, null);
             mEffectRecyclerView = (RecyclerView) mLayoutEffect.findViewById(R.id.preview_makeup_list);
@@ -262,7 +265,7 @@ public class PreviewEffectFragment extends Fragment implements View.OnClickListe
             mEffectAdapter.addOnMakeupSelectedListener(new PreviewEffectAdapter.OnMakeupSelectedListener() {
                 @Override
                 public void onMakeupSelected(int position, String makeupName) {
-                    Log.d(TAG, "onMakeupSelected: position = " + position + ", name = " + makeupName);
+                    PreviewRenderer.getInstance().changeEffectFilterType(GLImageFilterType.EFFECTILLUSION);
                 }
             });
         }
@@ -276,6 +279,7 @@ public class PreviewEffectFragment extends Fragment implements View.OnClickListe
      * 显示滤镜布局
      */
     private void showFilterLayout() {
+        mCameraParam.enableEffect = false;
         if (mLayoutFilter == null) {
             mLayoutFilter = (LinearLayout) mInflater.inflate(R.layout.view_preview_filter, null);
 

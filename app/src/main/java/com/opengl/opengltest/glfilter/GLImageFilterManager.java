@@ -83,10 +83,19 @@ public final class GLImageFilterManager {
         List<GLImageFilterType> filterTypes = new ArrayList<>();
         filterTypes.add(GLImageFilterType.SOURCE);
         filterTypes.add(GLImageFilterType.BLACKWHITE);
+        return filterTypes;
+    }
+    /**
+     * 获取特效滤镜类型
+     *
+     * @return
+     */
+    public static List<GLImageFilterType> getEffectFilterTypes() {
+        List<GLImageFilterType> filterTypes = new ArrayList<>();
+        filterTypes.add(GLImageFilterType.SOURCE);
         filterTypes.add(GLImageFilterType.EFFECTILLUSION);
         return filterTypes;
     }
-
     /**
      * 获取滤镜名称
      *

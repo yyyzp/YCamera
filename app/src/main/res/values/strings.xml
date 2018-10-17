@@ -17,6 +17,7 @@
 
     <!-- 特效-->
     <string-array name="preview_effect">
+        <item>默认</item>
         <item>幻觉</item>
     </string-array>
 </resources>

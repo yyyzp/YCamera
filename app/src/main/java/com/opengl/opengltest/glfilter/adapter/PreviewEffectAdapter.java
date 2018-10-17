@@ -25,8 +25,8 @@ public class PreviewEffectAdapter extends RecyclerView.Adapter<PreviewEffectAdap
 
     public PreviewEffectAdapter(Context context) {
         mContext = context;
-        String[] beautyLists = mContext.getResources().getStringArray(R.array.preview_effect);
-        mItemNames = Arrays.asList(beautyLists);
+        String[] effectLists = mContext.getResources().getStringArray(R.array.preview_effect);
+        mItemNames = Arrays.asList(effectLists);
     }
 
     @NonNull

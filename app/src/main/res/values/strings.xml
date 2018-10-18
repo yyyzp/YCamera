@@ -18,6 +18,9 @@
     <!-- 特效-->
     <string-array name="preview_effect">
         <item>默认</item>
+        <item>灵魂出窍</item>
         <item>幻觉</item>
+        <item>抖动</item>
+        <item>缩放</item>
     </string-array>
 </resources>

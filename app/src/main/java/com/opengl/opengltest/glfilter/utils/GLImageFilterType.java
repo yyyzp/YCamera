@@ -53,6 +53,9 @@ public enum GLImageFilterType {
     SUNSET,         // 日落
     WHITECAT,       // 白猫
 
-    EFFECTILLUSION //幻觉
+    EFFECTILLUSION, //幻觉
+    SOULSTUFF, //灵魂出窍
+    SHIFTRGB ,//rgb通道偏移
+    SCALE //缩放
 
 }

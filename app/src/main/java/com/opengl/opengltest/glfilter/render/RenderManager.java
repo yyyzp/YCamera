@@ -7,6 +7,7 @@ import com.opengl.opengltest.glfilter.advanced.GLImageEffectIllusionFilter;
 import com.opengl.opengltest.glfilter.base.GLImageFilter;
 import com.opengl.opengltest.glfilter.base.GLImageOESInputFilter;
 import com.opengl.opengltest.glfilter.camera.CameraParam;
+import com.opengl.opengltest.glfilter.filter.GLImageBeautyBlurFilter;
 import com.opengl.opengltest.glfilter.model.ScaleType;
 import com.opengl.opengltest.glfilter.utils.GLImageFilterType;
 import com.opengl.opengltest.utils.TextureRotationUtils;
@@ -155,6 +156,7 @@ public final class RenderManager {
         mDisplayFilter = new GLImageFilter(context);
         //特效
         mEffectFilter = new GLImageFilter(context);
+        mBeautyFilter = new GLImageBeautyBlurFilter(context);
     }
 
     /**
@@ -205,11 +207,15 @@ public final class RenderManager {
             mInputFilter.setTextureTransformMatirx(mMatrix);
             currentTexture = mInputFilter.drawFrameBuffer(currentTexture, mVertexBuffer, mTextureBuffer);
         }
-
+        if(mBeautyFilter!=null&&mCameraParam.filter_type==CameraParam.TYPE_EFFECT){
+            currentTexture = mBeautyFilter.drawFrameBuffer(currentTexture);
+        }
         if (mColorFilter != null) {
             currentTexture = mColorFilter.drawFrameBuffer(currentTexture);
         }
         if (mEffectFilter != null && mEffectFilter instanceof GLImageEffectIllusionFilter) {
+            currentTexture = mEffectFilter.drawFrameBuffer(currentTexture, mVertexBuffer, mTextureBuffer);
+        } else {
             currentTexture = mEffectFilter.drawFrameBuffer(currentTexture, mVertexBuffer, mTextureBuffer);
         }
 

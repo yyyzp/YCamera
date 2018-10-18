@@ -222,6 +222,7 @@ public class PreviewEffectFragment extends Fragment implements View.OnClickListe
      */
     private void showBeautyLayout() {
         mLayoutProgress.setVisibility(View.VISIBLE);
+        mCameraParam.filter_type = CameraParam.TYPE_BEAUTY;
         if (mLayoutBeauty == null) {
             mLayoutBeauty = (RelativeLayout) mInflater.inflate(R.layout.view_preview_beauty, null);
             mBeautyRecyclerView = (RecyclerView) mLayoutBeauty.findViewById(R.id.preview_beauty_list);
@@ -262,6 +263,7 @@ public class PreviewEffectFragment extends Fragment implements View.OnClickListe
             mEffectAdapter.addOnMakeupSelectedListener(new PreviewEffectAdapter.OnMakeupSelectedListener() {
                 @Override
                 public void onMakeupSelected(int position, String makeupName) {
+                    mCameraParam.filter_type = CameraParam.TYPE_EFFECT;
                     PreviewRenderer.getInstance().changeEffectFilterType(GLImageFilterManager.getEffectFilterTypes().get(position));
                 }
             });
@@ -291,6 +293,7 @@ public class PreviewEffectFragment extends Fragment implements View.OnClickListe
             mFilterAdapter.setOnFilterChangeListener(new PreviewFilterAdapter.OnFilterChangeListener() {
                 @Override
                 public void onFilterChanged(GLImageFilterType type) {
+                    mCameraParam.filter_type = CameraParam.TYPE_FILTER;
                     PreviewRenderer.getInstance().changeFilterType(type);
                     mCurrentFilterIndex = mFilterAdapter.getSelectedPosition();
                 }

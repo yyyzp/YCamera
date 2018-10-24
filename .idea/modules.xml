@@ -3,6 +3,8 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://E:\studioPro\opengltest\YCamera.iml" filepath="E:\studioPro\opengltest\YCamera.iml" />
+      <module fileurl="file://$PROJECT_DIR$/annotation/annotation.iml" filepath="$PROJECT_DIR$/annotation/annotation.iml" />
+      <module fileurl="file://$PROJECT_DIR$/annotationprocessor/annotationprocessor.iml" filepath="$PROJECT_DIR$/annotationprocessor/annotationprocessor.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
       <module fileurl="file://$PROJECT_DIR$/opengltest.iml" filepath="$PROJECT_DIR$/opengltest.iml" />
       <module fileurl="file://D:\AndroidStudio\android-studio-ide-171.4408382-windows\programme\YCamera\opengltest.iml" filepath="D:\AndroidStudio\android-studio-ide-171.4408382-windows\programme\YCamera\opengltest.iml" />

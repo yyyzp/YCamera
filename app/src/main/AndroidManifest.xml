@@ -59,7 +59,7 @@
             </intent-filter>
         </activity>-->
         <activity
-            android:name=".glfilter.GlFilterActivity"
+            android:name=".TestAnnotation1"
             android:configChanges="keyboard|screenSize|orientation"
             android:screenOrientation="portrait">
             <intent-filter>
@@ -68,6 +68,8 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity
+            android:name=".TestAnnotation2"/>
     </application>
 
 </manifest>

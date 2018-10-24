@@ -279,6 +279,15 @@ class RenderThread extends HandlerThread implements SurfaceTexture.OnFrameAvaila
             mRenderManager.changeFilter(mContext, type);
         }
     }
+     /**
+     * 更新   effectfilter
+     * @param type Filter类型
+     */
+    void changeEffectFilter(GLImageFilterType type) {
+        synchronized (mSynOperation) {
+            mRenderManager.changeEffectFilter(mContext, type);
+        }
+    }
 
     /**
      * 开始录制

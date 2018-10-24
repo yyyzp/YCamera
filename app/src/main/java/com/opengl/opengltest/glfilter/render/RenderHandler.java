@@ -26,6 +26,8 @@ class RenderHandler extends Handler {
     public static final int MSG_RENDER = 0x004;
     // 改变滤镜
     public static final int MSG_FILTER_TYPE = 0x005;
+    //改变特效滤镜
+    public static final int MSG_EFFECT_FILTER_TYPE = 0x014;
     // 开始录制
     public static final int MSG_START_RECORDING = 0x006;
     // 停止录制
@@ -79,6 +81,9 @@ class RenderHandler extends Handler {
             // 切换滤镜
             case MSG_FILTER_TYPE:
                 thread.changeFilter((GLImageFilterType) msg.obj);
+                break;  // 切换滤镜
+            case MSG_EFFECT_FILTER_TYPE:
+                thread.changeEffectFilter((GLImageFilterType) msg.obj);
                 break;
 
             // 开始录制

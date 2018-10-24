@@ -157,6 +157,17 @@ public final class PreviewRenderer {
             mRenderHandler.sendMessage(mRenderHandler
                     .obtainMessage(RenderHandler.MSG_FILTER_TYPE, type));
         }
+    }  /**
+     * 改变Filter类型
+     */
+    public void changeEffectFilterType(GLImageFilterType type) {
+        if (mRenderHandler == null) {
+            return;
+        }
+        synchronized (mSynOperation) {
+            mRenderHandler.sendMessage(mRenderHandler
+                    .obtainMessage(RenderHandler.MSG_EFFECT_FILTER_TYPE, type));
+        }
     }
 
 

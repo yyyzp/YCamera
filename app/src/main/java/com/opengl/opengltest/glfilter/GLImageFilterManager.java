@@ -3,7 +3,11 @@ package com.opengl.opengltest.glfilter;
 import android.content.Context;
 
 import com.opengl.opengltest.glfilter.advanced.GLImageEffectIllusionFilter;
+import com.opengl.opengltest.glfilter.advanced.GLImageEffectScaleFilter;
+import com.opengl.opengltest.glfilter.advanced.GLImageShiftRGBFilter;
+import com.opengl.opengltest.glfilter.advanced.GLImageSoulStuffFilter;
 import com.opengl.opengltest.glfilter.base.GLImageFilter;
+import com.opengl.opengltest.glfilter.filter.GLImageBlackWhiteFilter;
 import com.opengl.opengltest.glfilter.utils.GLImageFilterIndex;
 import com.opengl.opengltest.glfilter.utils.GLImageFilterType;
 
@@ -36,6 +40,8 @@ public final class GLImageFilterManager {
             case NONE:      // 没有滤镜
             case SOURCE:    // 原图
                 return new GLImageFilter(context);
+            case BLACKWHITE:
+                return new GLImageBlackWhiteFilter(context);
             default:
                 return new GLImageFilter(context);
         }
@@ -52,6 +58,12 @@ public final class GLImageFilterManager {
         switch (type) {
             case EFFECTILLUSION:
                 return new GLImageEffectIllusionFilter(context);
+            case SOULSTUFF:
+                return new GLImageSoulStuffFilter(context);
+            case SHIFTRGB:
+                return new GLImageShiftRGBFilter(context);
+            case SCALE:
+                return new GLImageEffectScaleFilter(context);
             default:
                 return new GLImageFilter(context);
         }
@@ -78,9 +90,23 @@ public final class GLImageFilterManager {
      */
     public static List<GLImageFilterType> getFilterTypes() {
         List<GLImageFilterType> filterTypes = new ArrayList<>();
+        filterTypes.add(GLImageFilterType.SOURCE);
+        filterTypes.add(GLImageFilterType.BLACKWHITE);
+        return filterTypes;
+    }
 
+    /**
+     * 获取特效滤镜类型
+     *
+     * @return
+     */
+    public static List<GLImageFilterType> getEffectFilterTypes() {
+        List<GLImageFilterType> filterTypes = new ArrayList<>();
+        filterTypes.add(GLImageFilterType.SOURCE);
+        filterTypes.add(GLImageFilterType.SOULSTUFF);
         filterTypes.add(GLImageFilterType.EFFECTILLUSION);
-
+        filterTypes.add(GLImageFilterType.SHIFTRGB);
+        filterTypes.add(GLImageFilterType.SCALE);
         return filterTypes;
     }
 
@@ -92,7 +118,8 @@ public final class GLImageFilterManager {
     public static List<String> getFilterNames() {
         List<String> filterNames = new ArrayList<>();
 
-        filterNames.add("幻觉");
+        filterNames.add("原图");
+        filterNames.add("黑白");
 
         return filterNames;
     }

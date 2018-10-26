@@ -12,7 +12,8 @@ import com.opengl.opengltest.glfilter.base.GLImageFilter;
  (2).平均值法: 使用每个像素点的 R,G,B值等于原像素点的RGB值的平均值；
  (3).加权平均值法: 对每个像素点的 R, G, B值进行加权
     自认为第三种方法做出来的黑白效果图像最 "真实".
- 这里采用最简单的1来实现
+
+    这里采用最简单的1来实现
  */
 
 public class GLImageBlackWhiteFilter extends GLImageFilter {

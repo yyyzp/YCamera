@@ -93,7 +93,9 @@ public class GLImageFilter {
     public GLImageFilter(Context context) {
         this(context, VERTEX_SHADER, FRAGMENT_SHADER_2D);
     }
-
+    public GLImageFilter( String vertexShader, String fragmentShader) {
+        this(null, vertexShader, fragmentShader);
+    }
     public GLImageFilter(Context context, String vertexShader, String fragmentShader) {
         mContext = context;
         mRunOnDraw = new LinkedList<>();

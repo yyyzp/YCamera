@@ -156,6 +156,7 @@ public final class RenderManager {
         mDisplayFilter = new GLImageFilter(context);
         //特效
         mEffectFilter = new GLImageFilter(context);
+        //美颜
         mBeautyFilter = new GLImageBeautyBlurFilter(context);
     }
 
@@ -207,7 +208,7 @@ public final class RenderManager {
             mInputFilter.setTextureTransformMatirx(mMatrix);
             currentTexture = mInputFilter.drawFrameBuffer(currentTexture, mVertexBuffer, mTextureBuffer);
         }
-        if(mBeautyFilter!=null&&mCameraParam.filter_type==CameraParam.TYPE_EFFECT){
+        if (mBeautyFilter != null && mCameraParam.filter_type == CameraParam.TYPE_EFFECT) {
             currentTexture = mBeautyFilter.drawFrameBuffer(currentTexture);
         }
         if (mColorFilter != null) {

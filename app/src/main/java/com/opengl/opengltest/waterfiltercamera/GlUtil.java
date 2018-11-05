@@ -1,8 +1,14 @@
 package com.opengl.opengltest.waterfiltercamera;
 
+import android.content.Context;
+import android.graphics.Bitmap;
 import android.opengl.GLES11Ext;
 import android.opengl.GLES20;
+import android.opengl.GLES30;
+import android.opengl.GLUtils;
 import android.util.Log;
+
+import com.opengl.opengltest.utils.BitmapUtils;
 
 import java.nio.Buffer;
 
@@ -96,5 +102,37 @@ public class GlUtil {
         //        0, GLES20.GL_RGBA, GLES20.GL_UNSIGNED_BYTE,
         //        databuffer);
         return texId;
+    }
+
+    /**
+     * 加载mipmap纹理
+     * @param context
+     * @param name
+     * @return
+     */
+    public static int createTextureFromAssets(Context context, String name) {
+        int[] textureHandle = new int[1];
+        GLES30.glGenTextures(1, textureHandle, 0);
+        if (textureHandle[0] != 0) {
+            Bitmap bitmap = BitmapUtils.getImageFromAssetsFile(context, name);
+            GLES30.glBindTexture(GLES30.GL_TEXTURE_2D, textureHandle[0]);
+
+            GLES30.glTexParameterf(GLES30.GL_TEXTURE_2D,
+                    GLES30.GL_TEXTURE_MAG_FILTER, GLES30.GL_LINEAR);
+            GLES30.glTexParameterf(GLES30.GL_TEXTURE_2D,
+                    GLES30.GL_TEXTURE_MIN_FILTER, GLES30.GL_LINEAR);
+            GLES30.glTexParameterf(GLES30.GL_TEXTURE_2D,
+                    GLES30.GL_TEXTURE_WRAP_S, GLES30.GL_CLAMP_TO_EDGE);
+            GLES30.glTexParameterf(GLES30.GL_TEXTURE_2D,
+                    GLES30.GL_TEXTURE_WRAP_T, GLES30.GL_CLAMP_TO_EDGE);
+            GLUtils.texImage2D(GLES30.GL_TEXTURE_2D, 0, bitmap, 0);
+            bitmap.recycle();
+        }
+        Log.d("createTextureFromAssets", "name:" + name + ", texture = " + textureHandle[0]);
+        if (textureHandle[0] == 0) {
+            throw new RuntimeException("Error loading texture.");
+        }
+
+        return textureHandle[0];
     }
 }

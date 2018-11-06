@@ -28,8 +28,10 @@ import com.opengl.opengltest.glfilter.filter.color.GLLomoFilter;
 import com.opengl.opengltest.glfilter.filter.color.GLNostalgiaFilter;
 import com.opengl.opengltest.glfilter.filter.color.GLRomanceFilter;
 import com.opengl.opengltest.glfilter.filter.color.GLSakuraFilter;
+import com.opengl.opengltest.glfilter.filter.color.GLSaturationFilter;
 import com.opengl.opengltest.glfilter.filter.color.GLSunsetFilter;
 import com.opengl.opengltest.glfilter.filter.color.GLWhiteCatFilter;
+import com.opengl.opengltest.glfilter.filter.color.GLBrightnessFilter;
 import com.opengl.opengltest.glfilter.utils.GLImageFilterIndex;
 import com.opengl.opengltest.glfilter.utils.GLImageFilterType;
 
@@ -148,8 +150,12 @@ public final class GLImageFilterManager {
             // 白猫
             case WHITECAT:
                 return new GLWhiteCatFilter(context);
-
-
+            //亮度
+            case BRIGHTNESS:
+                return new GLBrightnessFilter(context);
+            // 饱和度
+            case SATURATION:
+                return new GLSaturationFilter(context);
             case NONE:      // 没有滤镜
             case SOURCE:    // 原图
                 return new GLImageFilter(context);
@@ -226,6 +232,8 @@ public final class GLImageFilterManager {
         filterTypes.add(GLImageFilterType.SAKURA);
         filterTypes.add(GLImageFilterType.SUNSET);
         filterTypes.add(GLImageFilterType.WHITECAT);
+        filterTypes.add(GLImageFilterType.BRIGHTNESS);
+        filterTypes.add(GLImageFilterType.SATURATION);
         return filterTypes;
     }
 
@@ -275,6 +283,8 @@ public final class GLImageFilterManager {
         filterNames.add("樱花");
         filterNames.add("日落");
         filterNames.add("白猫");
+        filterNames.add("亮度");
+        filterNames.add("饱和度");
 
         return filterNames;
     }

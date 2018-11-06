@@ -8,6 +8,8 @@ import com.opengl.opengltest.glfilter.base.GLImageFilter;
 import com.opengl.opengltest.glfilter.base.GLImageOESInputFilter;
 import com.opengl.opengltest.glfilter.camera.CameraParam;
 import com.opengl.opengltest.glfilter.filter.GLImageBeautyBlurFilter;
+import com.opengl.opengltest.glfilter.filter.color.GLBrightnessFilter;
+import com.opengl.opengltest.glfilter.filter.color.GLSaturationFilter;
 import com.opengl.opengltest.glfilter.model.ScaleType;
 import com.opengl.opengltest.glfilter.utils.GLImageFilterType;
 import com.opengl.opengltest.utils.TextureRotationUtils;
@@ -363,5 +365,15 @@ public final class RenderManager {
      */
     private float addDistance(float coordinate, float distance) {
         return coordinate == 0.0f ? distance : 1 - distance;
+    }
+
+    public void setBrightness(float num) {
+        if (mColorFilter instanceof GLBrightnessFilter)
+            mColorFilter.setStrength(num);
+    }
+
+    public void setSaturation(float num) {
+        if (mColorFilter instanceof GLSaturationFilter)
+            mColorFilter.setSaturation(num);
     }
 }

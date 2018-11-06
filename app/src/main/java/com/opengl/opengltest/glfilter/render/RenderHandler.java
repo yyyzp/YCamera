@@ -43,6 +43,9 @@ class RenderHandler extends Handler {
     // 计算fps
     public static final int MSG_CALCULATE_FPS = 0x013;
 
+    public static final int MSG_CHANGE_BRIGHTNESS = 0x015;
+    public static final int MSG_CHANGE_SATURATION = 0x016;
+
     private WeakReference<RenderThread> mWeakRenderThread;
 
     public RenderHandler(RenderThread thread) {
@@ -60,7 +63,7 @@ class RenderHandler extends Handler {
 
             // surfaceCreated
             case MSG_SURFACE_CREATED:
-                thread.surfaceCreated((SurfaceHolder)msg.obj);
+                thread.surfaceCreated((SurfaceHolder) msg.obj);
                 break;
 
             // surfaceChanged
@@ -85,7 +88,12 @@ class RenderHandler extends Handler {
             case MSG_EFFECT_FILTER_TYPE:
                 thread.changeEffectFilter((GLImageFilterType) msg.obj);
                 break;
-
+            case MSG_CHANGE_BRIGHTNESS:
+                thread.setBrightness((float) msg.obj);
+                break;
+            case MSG_CHANGE_SATURATION:
+                thread.setSaturation((float) msg.obj);
+                break;
             // 开始录制
             case MSG_START_RECORDING:
                 thread.startRecording();
@@ -108,7 +116,7 @@ class RenderHandler extends Handler {
 
             // 预览帧回调
             case MSG_PREVIEW_CALLBACK:
-                thread.onPreviewCallback((byte[])msg.obj);
+                thread.onPreviewCallback((byte[]) msg.obj);
                 break;
 
             // 拍照

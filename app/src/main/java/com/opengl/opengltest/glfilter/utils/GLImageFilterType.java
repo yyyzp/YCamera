@@ -56,6 +56,7 @@ public enum GLImageFilterType {
     EFFECTILLUSION, //幻觉
     SOULSTUFF, //灵魂出窍
     SHIFTRGB ,//rgb通道偏移 ，抖动
-    SCALE //缩放
+    SCALE ,//缩放
+
 
 }

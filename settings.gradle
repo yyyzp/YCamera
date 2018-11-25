@@ -1,1 +1,1 @@
-include ':app', ':annotation', ':annotationprocessor'
+include ':app', ':annotation', ':annotationprocessor','Plugin'

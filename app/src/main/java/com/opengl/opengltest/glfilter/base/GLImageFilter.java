@@ -90,8 +90,13 @@ public class GLImageFilter {
     // 变换矩阵
     protected float[] mMVPMatrix = new float[16];
     private int mTextureId;
+
     public GLImageFilter(Context context) {
         this(context, VERTEX_SHADER, FRAGMENT_SHADER_2D);
+    }
+
+    public GLImageFilter(String vertexShader, String fragmentShader) {
+        this(null, vertexShader, fragmentShader);
     }
 
     public GLImageFilter(Context context, String vertexShader, String fragmentShader) {
@@ -154,6 +159,7 @@ public class GLImageFilter {
 
     /**
      * Surface发生变化时调用
+     *
      * @param width
      * @param height
      */
@@ -163,7 +169,8 @@ public class GLImageFilter {
     }
 
     /**
-     *  显示视图发生变化时调用
+     * 显示视图发生变化时调用
+     *
      * @param width
      * @param height
      */
@@ -174,6 +181,7 @@ public class GLImageFilter {
 
     /**
      * 绘制Frame
+     *
      * @param textureId
      */
     public boolean drawFrame(int textureId) {
@@ -182,13 +190,14 @@ public class GLImageFilter {
 
     /**
      * 绘制Frame
+     *
      * @param textureId
      * @param vertexBuffer
      * @param textureBuffer
      */
     public boolean drawFrame(int textureId, FloatBuffer vertexBuffer,
                              FloatBuffer textureBuffer) {
-        mTextureId=textureId;
+        mTextureId = textureId;
         // 没有初始化、输入纹理不合法、滤镜不可用时直接返回
         if (!mIsInitialized || textureId == OpenGLUtils.GL_NOT_INIT || !mFilterEnable) {
             return false;
@@ -233,6 +242,7 @@ public class GLImageFilter {
 
     /**
      * 绘制到FBO
+     *
      * @param textureId
      * @return FBO绑定的Texture
      */
@@ -242,6 +252,7 @@ public class GLImageFilter {
 
     /**
      * 绘制到FBO
+     *
      * @param textureId
      * @param vertexBuffer
      * @param textureBuffer
@@ -305,9 +316,11 @@ public class GLImageFilter {
     public int getTextureType() {
         return GLES30.GL_TEXTURE_2D;
     }
-    public int getTextureId(){
+
+    public int getTextureId() {
         return mFrameBufferTextures[0];
     }
+
     /**
      * 调用glDrawArrays/glDrawElements之前，方便添加其他属性
      */
@@ -336,6 +349,7 @@ public class GLImageFilter {
 
     /**
      * 创建FBO
+     *
      * @param width
      * @param height
      */
@@ -384,6 +398,7 @@ public class GLImageFilter {
 
     /**
      * 设置变换矩阵
+     *
      * @param matrix
      */
     public void setMVPMatrix(float[] matrix) {
@@ -394,6 +409,7 @@ public class GLImageFilter {
 
     /**
      * 判断是否初始化
+     *
      * @return
      */
     public boolean isInitialized() {
@@ -402,6 +418,7 @@ public class GLImageFilter {
 
     /**
      * 设置滤镜是否可用
+     *
      * @param enable
      */
     public void setFilterEnable(boolean enable) {
@@ -410,6 +427,7 @@ public class GLImageFilter {
 
     /**
      * 设置时钟
+     *
      * @param currentTimer
      */
     public void setTimerValue(float currentTimer) {
@@ -418,6 +436,7 @@ public class GLImageFilter {
 
     /**
      * 获取输出宽度
+     *
      * @return
      */
     public int getDisplayWidth() {
@@ -426,6 +445,7 @@ public class GLImageFilter {
 
     /**
      * 获取输出高度
+     *
      * @return
      */
     public int getDisplayHeight() {
@@ -522,6 +542,7 @@ public class GLImageFilter {
 
     /**
      * 添加延时任务
+     *
      * @param runnable
      */
     protected void runOnDraw(final Runnable runnable) {
@@ -537,5 +558,11 @@ public class GLImageFilter {
         while (!mRunOnDraw.isEmpty()) {
             mRunOnDraw.removeFirst().run();
         }
+    }
+    public void setStrength(float strength){
+
+    }
+    public void setSaturation(float strength){
+
     }
 }

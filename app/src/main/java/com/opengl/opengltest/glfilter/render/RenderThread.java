@@ -288,7 +288,13 @@ class RenderThread extends HandlerThread implements SurfaceTexture.OnFrameAvaila
             mRenderManager.changeEffectFilter(mContext, type);
         }
     }
+    void setBrightness(float num){
+        mRenderManager.setBrightness(num);
+    }
 
+    void setSaturation(float num){
+        mRenderManager.setSaturation(num);
+    }
     /**
      * 开始录制
      */

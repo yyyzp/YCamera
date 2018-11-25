@@ -158,7 +158,7 @@ public final class PreviewRenderer {
                     .obtainMessage(RenderHandler.MSG_FILTER_TYPE, type));
         }
     }  /**
-     * 改变Filter类型
+     * 改变Effect类型
      */
     public void changeEffectFilterType(GLImageFilterType type) {
         if (mRenderHandler == null) {
@@ -169,7 +169,30 @@ public final class PreviewRenderer {
                     .obtainMessage(RenderHandler.MSG_EFFECT_FILTER_TYPE, type));
         }
     }
-
+    /**
+     * 改变亮度
+     */
+    public void changeBrightness(float  num) {
+        if (mRenderHandler == null) {
+            return;
+        }
+        synchronized (mSynOperation) {
+            mRenderHandler.sendMessage(mRenderHandler
+                    .obtainMessage(RenderHandler.MSG_CHANGE_BRIGHTNESS, num));
+        }
+    }
+    /**
+     * 改变饱和度
+     */
+    public void changeSaturation(float  num) {
+        if (mRenderHandler == null) {
+            return;
+        }
+        synchronized (mSynOperation) {
+            mRenderHandler.sendMessage(mRenderHandler
+                    .obtainMessage(RenderHandler.MSG_CHANGE_SATURATION, num));
+        }
+    }
 
     /**
      * 开始录制

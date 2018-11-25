@@ -87,6 +87,8 @@ public class PreviewEffectFragment extends Fragment implements View.OnClickListe
     // 相机参数
     private CameraParam mCameraParam;
 
+    private GLImageFilterType mType;
+
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
@@ -172,7 +174,11 @@ public class PreviewEffectFragment extends Fragment implements View.OnClickListe
             } else if (mTitleButtonIndex == 1) { // 彩妆
 
             } else if (mTitleButtonIndex == 2) { // 滤镜
-
+                if (mType == GLImageFilterType.BRIGHTNESS) {
+                    PreviewRenderer.getInstance().changeBrightness((float) (progress / 100.0));
+                } else if (mType == GLImageFilterType.SATURATION) {
+                    PreviewRenderer.getInstance().changeSaturation((float) (progress / 100.0));
+                }
             }
         }
     }
@@ -278,6 +284,7 @@ public class PreviewEffectFragment extends Fragment implements View.OnClickListe
      * 显示滤镜布局
      */
     private void showFilterLayout() {
+        mLayoutProgress.setVisibility(View.VISIBLE);
         if (mLayoutFilter == null) {
             mLayoutFilter = (LinearLayout) mInflater.inflate(R.layout.view_preview_filter, null);
 
@@ -296,6 +303,7 @@ public class PreviewEffectFragment extends Fragment implements View.OnClickListe
                     mCameraParam.filter_type = CameraParam.TYPE_FILTER;
                     PreviewRenderer.getInstance().changeFilterType(type);
                     mCurrentFilterIndex = mFilterAdapter.getSelectedPosition();
+                    mType = type;
                 }
             });
             if (mCurrentFilterIndex != mFilterAdapter.getSelectedPosition()) {

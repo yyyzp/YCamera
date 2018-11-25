@@ -1,46 +1,19 @@
-package com.opengl.opengltest.glfilter.filter;
+package com.opengl.opengltest.glfilter.filter.color;
+
 
 import android.content.Context;
 
 import com.opengl.opengltest.glfilter.base.GLImageFilter;
 
 /**
- * 黑白效果
- * Created by yzp on 2018/10/15.
- 原理: 彩色图像处理成黑白效果通常有3种算法；
- (1).最大值法: 使每个像素点的 R, G, B 值等于原像素点的 RGB (颜色值) 中最大的一个；
- (2).平均值法: 使用每个像素点的 R,G,B值等于原像素点的RGB值的平均值；
- (3).加权平均值法: 对每个像素点的 R, G, B值进行加权
-    自认为第三种方法做出来的黑白效果图像最 "真实".
-
-    这里采用最简单的1来实现
+ * 黑白
+ * Created by cain on 2017/11/15.
  */
 
-public class GLImageBlackWhiteFilter extends GLImageFilter {
+public class GLBlackWhiteFilter extends GLImageFilter {
 
-    private static final String FRAGMENT_SHADER = "" +
+    private static final String FRAGMENT_SHADER =
             "precision mediump float;\n" +
-            "uniform sampler2D inputTexture;\n" +
-            "varying vec2 textureCoordinate;\n" +
-            "void main() {\n" +
-            "vec4 color = texture2D(inputTexture, textureCoordinate);\n" +
-            "vec4 blackwhite = vec4(max(max(color.r,color.g),color.b),max(max(color.r,color.g),color.b),max(max(color.r,color.g),color.b),1);\n" +
-            "gl_FragColor = blackwhite;\n" +
-            "}\n";
-
-
-    public GLImageBlackWhiteFilter(Context context) {
-        this(context, VERTEX_SHADER, FRAGMENT_SHADER);
-    }
-
-    public GLImageBlackWhiteFilter(Context context, String vertexShader, String fragmentShader) {
-        super(context, vertexShader, fragmentShader);
-    }
-}
-
-/*
-    另一种实现 原理尚未研究明白
-  "precision mediump float;\n" +
             "uniform sampler2D inputTexture;\n" +
             "varying vec2 textureCoordinate;\n" +
             "\n" +
@@ -119,4 +92,13 @@ public class GLImageBlackWhiteFilter extends GLImageFilter {
             "color = calBrightnessContract(color, 0.0, 16.0, 128.0);\n" +
             "gl_FragColor = color;\n" +
             "}\n" +
-            "\n";*/
+            "\n";
+
+    public GLBlackWhiteFilter(Context context) {
+        this(context,VERTEX_SHADER, FRAGMENT_SHADER);
+    }
+
+    public GLBlackWhiteFilter(Context context,String vertexShader, String fragmentShader) {
+        super(context,vertexShader, fragmentShader);
+    }
+}

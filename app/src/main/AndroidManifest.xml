@@ -38,31 +38,28 @@
             </intent-filter>
         </activity>
         -->
-      <!--  <activity
-            android:name=".customview.TestCustomActivity"
-            android:configChanges="keyboard|screenSize|orientation"
-            android:screenOrientation="portrait">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
+        <!--  <activity
+              android:name=".customview.TestCustomActivity"
+              android:configChanges="keyboard|screenSize|orientation"
+              android:screenOrientation="portrait">
+              <intent-filter>
+                  <action android:name="android.intent.action.MAIN" />
 
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>-->
-    <!--    <activity
-            android:name=".TestActivity"
-            android:configChanges="keyboard|screenSize|orientation"
-            android:screenOrientation="portrait">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
+                  <category android:name="android.intent.category.LAUNCHER" />
+              </intent-filter>
+          </activity>-->
+        <!--    <activity
+                android:name=".TestActivity"
+                android:configChanges="keyboard|screenSize|orientation"
+                android:screenOrientation="portrait">
+                <intent-filter>
+                    <action android:name="android.intent.action.MAIN" />
 
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>-->
+                    <category android:name="android.intent.category.LAUNCHER" />
+                </intent-filter>
+            </activity>-->
         <activity
             android:name="will.github.com.androidaop.MainActivity"
-        </activity>
-       <!-- <activity
-            android:name=".TestAnnotation1"
             android:configChanges="keyboard|screenSize|orientation"
             android:screenOrientation="portrait">
             <intent-filter>
@@ -71,19 +68,29 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity android:name="will.github.com.androidaop.SecondActivity"></activity>
+        <!-- <activity
+             android:name=".TestAnnotation1"
+             android:configChanges="keyboard|screenSize|orientation"
+             android:screenOrientation="portrait">
+             <intent-filter>
+                 <action android:name="android.intent.action.MAIN" />
 
-     <!--   <activity
-            android:name=".TestAnnotation1"
-            android:configChanges="keyboard|screenSize|orientation"
-            android:screenOrientation="portrait">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
+                 <category android:name="android.intent.category.LAUNCHER" />
+             </intent-filter>
+         </activity>
 
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>-->
-        <activity
-            android:name=".TestAnnotation2"/>-->
+      <!   <activity
+             android:name=".TestAnnotation1"
+             android:configChanges="keyboard|screenSize|orientation"
+             android:screenOrientation="portrait">
+             <intent-filter>
+                 <action android:name="android.intent.action.MAIN" />
+
+                 <category android:name="android.intent.category.LAUNCHER" />
+             </intent-filter>
+         </activity>-->
+        <activity android:name=".TestAnnotation2" />
     </application>
 
 </manifest>

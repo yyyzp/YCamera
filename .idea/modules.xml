@@ -3,11 +3,17 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/Plugin/Plugin.iml" filepath="$PROJECT_DIR$/Plugin/Plugin.iml" />
+      <module fileurl="file://D:\AndroidStudio\android-studio-ide-171.4408382-windows\programme\YCamera2\Plugin\Plugin.iml" filepath="D:\AndroidStudio\android-studio-ide-171.4408382-windows\programme\YCamera2\Plugin\Plugin.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/YCamera2.iml" filepath="$PROJECT_DIR$/.idea/YCamera2.iml" />
       <module fileurl="file://$PROJECT_DIR$/annotation/annotation.iml" filepath="$PROJECT_DIR$/annotation/annotation.iml" />
+      <module fileurl="file://D:\AndroidStudio\android-studio-ide-171.4408382-windows\programme\YCamera2\annotation\annotation.iml" filepath="D:\AndroidStudio\android-studio-ide-171.4408382-windows\programme\YCamera2\annotation\annotation.iml" />
       <module fileurl="file://$PROJECT_DIR$/annotationprocessor/annotationprocessor.iml" filepath="$PROJECT_DIR$/annotationprocessor/annotationprocessor.iml" />
+      <module fileurl="file://D:\AndroidStudio\android-studio-ide-171.4408382-windows\programme\YCamera2\annotationprocessor\annotationprocessor.iml" filepath="D:\AndroidStudio\android-studio-ide-171.4408382-windows\programme\YCamera2\annotationprocessor\annotationprocessor.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
+      <module fileurl="file://D:\AndroidStudio\android-studio-ide-171.4408382-windows\programme\YCamera2\app\app.iml" filepath="D:\AndroidStudio\android-studio-ide-171.4408382-windows\programme\YCamera2\app\app.iml" />
       <module fileurl="file://$PROJECT_DIR$/buildsrc/buildsrc.iml" filepath="$PROJECT_DIR$/buildsrc/buildsrc.iml" />
-      <module fileurl="file://$PROJECT_DIR$/opengltest.iml" filepath="$PROJECT_DIR$/opengltest.iml" />
+      <module fileurl="file://D:\AndroidStudio\android-studio-ide-171.4408382-windows\programme\YCamera2\buildsrc\buildsrc.iml" filepath="D:\AndroidStudio\android-studio-ide-171.4408382-windows\programme\YCamera2\buildsrc\buildsrc.iml" />
+      <module fileurl="file://D:\AndroidStudio\android-studio-ide-171.4408382-windows\programme\YCamera2\opengltest.iml" filepath="D:\AndroidStudio\android-studio-ide-171.4408382-windows\programme\YCamera2\opengltest.iml" />
     </modules>
   </component>
 </project>

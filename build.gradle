@@ -6,7 +6,7 @@ buildscript {
         google()
         jcenter()
         maven {//本地Maven仓库地址
-            url uri('../opengltest/repo')
+            url uri('../YCamera2/repo')
         }
     }
     dependencies {
@@ -15,6 +15,7 @@ buildscript {
         classpath 'com.yzp.plugin:fuck:1.0.0'
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle files
+        //ASDASDASDASD
     }
 }
 

@@ -5,13 +5,14 @@ import org.objectweb.asm.Label;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.commons.AdviceAdapter;
+
 /**
- * Created by Answer on 2018/11/25.
+ * 对继承自AppCompatActivity的Activity进行插桩
  */
 
 public class TraceVisitor extends ClassVisitor {
 
-    /**a
+    /**
      * 类名
      */
     private String className;

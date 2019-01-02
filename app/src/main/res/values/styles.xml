@@ -10,9 +10,21 @@
         <item name="android:windowIsTranslucent">true</item>
         <item name="android:windowAnimationStyle">@style/Animation.Activity.Translucent.Style</item>
     </style>
+
+    <style name="AppTheme2" parent="Theme.AppCompat.Light.NoActionBar">
+        <!-- Customize your theme here. -->
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorAccent">@color/colorAccent</item>
+
+        <item name="android:windowAnimationStyle">@style/Animation.Activity.Style</item>
+    </style>
     <style name="Animation.Activity.Translucent.Style" parent="@android:style/Animation.Translucent">
     <item name="android:windowEnterAnimation">@anim/slide_in</item>
     <item name="android:windowExitAnimation">@anim/slide_out</item>
     </style>
-
+    <style name="Animation.Activity.Style" parent="@android:style/Animation.Activity">
+        <item name="android:activityOpenEnterAnimation">@anim/activity_open_enter</item>
+        <item name="android:activityCloseExitAnimation">@anim/activity_close_exit</item>
+    </style>
 </resources>

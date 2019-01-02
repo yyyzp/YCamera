@@ -69,7 +69,8 @@
             </intent-filter>
         </activity>
         <activity android:name="will.github.com.androidaop.SecondActivity"></activity>
-        <activity android:name="will.github.com.androidaop.ThirdActivity"/>
+        <activity android:name="will.github.com.androidaop.ThirdActivity"
+            android:theme="@style/AppTheme2"/>
         <!-- <activity
              android:name=".TestAnnotation1"
              android:configChanges="keyboard|screenSize|orientation"

@@ -10,7 +10,7 @@ import com.opengl.opengltest.R;
 
 import will.github.com.androidaop.traceutils.TraceUtil;
 
-public class MainActivity extends AppCompatActivity implements View.OnClickListener {
+public class MainActivity extends BaseActivity implements View.OnClickListener {
 
     TextView tv_jump;
 
